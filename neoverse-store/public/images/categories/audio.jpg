@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A044E"/>
+      <stop offset="100%" style="stop-color:#A21CAF"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#g)" rx="20"/>
+  <g transform="translate(200,155)" fill="none" stroke="rgba(232,121,249,0.6)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="-45" cy="0" r="35"/>
+    <circle cx="45" cy="0" r="35"/>
+    <path d="M-10,-50 Q-10,-90 10,-90 Q30,-90 30,-50"/>
+    <line x1="10" y1="-90" x2="10" y2="-110"/>
+    <path d="M-10,-110 Q-10,-115 -5,-115 L25,-115 Q30,-115 30,-110 L30,-100"/>
+    <line x1="0" y1="35" x2="0" y2="60"/>
+    <path d="M-20,60 Q-20,75 0,75 Q20,75 20,60"/>
+    <circle cx="-45" cy="0" r="15" fill="rgba(232,121,249,0.15)" stroke="none"/>
+    <circle cx="45" cy="0" r="15" fill="rgba(232,121,249,0.15)" stroke="none"/>
+  </g>
+  <text x="200" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="rgba(255,255,255,0.7)" letter-spacing="3">AUDIO</text>
+</svg>

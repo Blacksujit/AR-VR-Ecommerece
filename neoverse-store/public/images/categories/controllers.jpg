@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C2D12"/>
+      <stop offset="100%" style="stop-color:#EA580C"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#g)" rx="20"/>
+  <g transform="translate(200,160)" fill="none" stroke="rgba(246,173,85,0.6)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-80" y="-35" width="60" height="70" rx="12"/>
+    <rect x="20" y="-35" width="60" height="70" rx="12"/>
+    <line x1="-20" y1="0" x2="20" y2="0"/>
+    <circle cx="-50" cy="25" r="8" fill="rgba(246,173,85,0.3)" stroke="none"/>
+    <circle cx="50" cy="25" r="8" fill="rgba(246,173,85,0.3)" stroke="none"/>
+    <circle cx="-130" cy="0" r="18" stroke-width="5"/>
+    <circle cx="130" cy="0" r="18" stroke-width="5"/>
+    <circle cx="-130" cy="0" r="5" fill="rgba(246,173,85,0.4)" stroke="none"/>
+    <circle cx="130" cy="0" r="5" fill="rgba(246,173,85,0.4)" stroke="none"/>
+  </g>
+  <text x="200" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="rgba(255,255,255,0.7)" letter-spacing="3">CONTROLLERS</text>
+</svg>

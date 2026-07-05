@@ -1,0 +1,41 @@
+You are the lead engineer on this project.
+
+We will build this product incrementally using the attached PRD.
+
+Rules:
+
+1. Never implement placeholder features.
+2. Every button must perform a real action.
+3. Build one module at a time.
+4. Do not move to the next module until the current one is complete, tested, and production-ready.
+5. Use reusable components and a feature-based architecture.
+6. Maintain strict TypeScript, clean architecture, and SOLID principles.
+7. Ensure responsiveness, accessibility, and performance for every module.
+8. If a requested feature cannot be fully implemented within the MVP scope, implement the smallest genuinely functional version instead of mocking it.
+9. Keep the codebase deployable at all times.
+10. After completing each module, provide:
+   - What was implemented
+   - Files created or modified
+   - API changes
+   - Database changes
+   - Testing checklist
+   - Remaining improvements
+
+We will implement modules in this order:
+
+1. Foundation & Architecture
+2. Authentication
+3. Product Catalog
+4. Product Details
+5. 3D Viewer
+6. AR Experience
+7. VR Showroom
+8. Wishlist
+9. Cart & Checkout
+10. AI Recommendations
+11. Voice Search
+12. Contact & Inquiry
+13. Performance Optimization
+14. Final QA & Deployment
+
+Do not skip steps. Treat each module as production software before proceeding to the next.

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F2937"/>
+      <stop offset="100%" style="stop-color:#4B5563"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#g)" rx="20"/>
+  <g transform="translate(200,150)" fill="none" stroke="rgba(209,213,219,0.6)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="0" r="45"/>
+    <circle cx="0" cy="0" r="55"/>
+    <line x1="45" y1="0" x2="55" y2="0"/>
+    <line x1="-45" y1="0" x2="-55" y2="0"/>
+    <line x1="0" y1="45" x2="0" y2="55"/>
+    <line x1="0" y1="-45" x2="0" y2="-55"/>
+    <circle cx="0" cy="0" r="20"/>
+    <circle cx="0" cy="0" r="12" fill="rgba(209,213,219,0.2)" stroke="none"/>
+  </g>
+  <text x="200" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="rgba(255,255,255,0.7)" letter-spacing="3">ACCESSORIES</text>
+</svg>
