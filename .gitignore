@@ -1,0 +1,149 @@
+# Ignore specific files and directories
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build output
+dist/
+out/
+build/
+
+# Dependency directories
+lib/
+tmp/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Misc
+*.class
+*.hprof
+.DS_Store
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Compiled output
+*.com
+*.exe
+*.o
+*.so
+*.dylib
+
+# Dependency files
+package-lock.json
+yarn.lock
+
+# IDE settings
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.pgsql
+*.tmp
+*.bak
+*.swo
+*.bz2
+*.gz
+*.tgz
+*.7z
+*.zip
+*.rar
+
+# Testing
+/coverage
+
+#IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Dependency directories
+node_modules/
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/caching.html)
+.cache
+
+# next.js build output
+.next/
+
+# Nuxt.js build / generate output
+dist/
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Ignore other repositories
+claude-skills/
+.commandcode/
