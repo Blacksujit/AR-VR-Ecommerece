@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs'
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import Providers from "@/components/layout/Providers";
@@ -36,14 +35,12 @@ export default function RootLayout({
       className={cn(inter.variable, spaceGrotesk.variable, "h-full antialiased")}
     >
       <body className="min-h-full flex flex-col grid-bg noise-bg">
-        <ClerkProvider>
-          <Providers>
-            <Navbar />
-            <main className="flex-1 pt-16">{children}</main>
-            <Footer />
-            <AIChatBot />
-          </Providers>
-        </ClerkProvider>
+        <Providers>
+          <Navbar />
+          <main className="flex-1 pt-16">{children}</main>
+          <Footer />
+          <AIChatBot />
+        </Providers>
       </body>
     </html>
   );

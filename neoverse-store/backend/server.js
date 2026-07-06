@@ -23,6 +23,7 @@ const aiRoutes = require('./routes/aiRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const resendRoutes = require('./routes/resendRoutes');
 const userRoutes = require('./routes/userRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 
@@ -92,6 +93,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/email', resendRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.get('/api', (req, res) => {
   res.json({ message: 'NeoVerse Store API is running' });

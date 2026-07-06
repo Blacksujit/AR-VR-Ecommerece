@@ -1,9 +1,10 @@
 'use client'
-import { lazy } from 'react'
+import dynamic from 'next/dynamic'
 import ProductRecommendations from '@/components/product/ProductRecommendations'
 
-const VRShowroomScene = lazy(() =>
-  import('@/components/ar-vr/VRShowroomScene').then(mod => ({ default: mod.VRShowroomScene }))
+const VRShowroomScene = dynamic(
+  () => import('@/components/ar-vr/VRShowroomScene').then(mod => ({ default: mod.VRShowroomScene })),
+  { ssr: false }
 )
 
 export default function VRShowroomWrapper() {

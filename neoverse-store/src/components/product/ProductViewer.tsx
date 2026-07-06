@@ -2,49 +2,33 @@
 
 import { useState, useRef, Suspense, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, ContactShadows, Environment, Html, useProgress } from '@react-three/drei'
+import { OrbitControls, ContactShadows, Environment, Html, useProgress, useGLTF } from '@react-three/drei'
 import { Mesh, Group } from 'three'
 import { Loader2, Maximize2, Minimize2, RotateCcw, Expand } from 'lucide-react'
 
-function ModelViewer({ modelUrl }: { modelUrl: string }) {
+function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRotate?: boolean }) {
   const meshRef = useRef<Group>(null)
 
   useFrame((_, delta) => {
-    if (meshRef.current) {
+    if (meshRef.current && autoRotate) {
       meshRef.current.rotation.y += delta * 0.15
     }
   })
 
-  if (modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf')) {
-    return (
-      <Suspense fallback={<Loader />}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={0.8} />
-        <directionalLight position={[-5, 5, -5]} intensity={0.3} />
-        <group ref={meshRef}>
-          <GLTFModel url={modelUrl} />
-        </group>
-        <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={5} blur={2} />
-        <Environment preset="city" />
-        <OrbitControls
-          enablePan={false}
-          minDistance={2}
-          maxDistance={8}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2}
-        />
-      </Suspense>
-    )
-  }
-
   return (
     <Suspense fallback={<Loader />}>
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf') ? 0.5 : 0.6} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} />
-      <pointLight position={[0, 3, 0]} intensity={0.3} />
+      {!modelUrl.endsWith('.glb') && !modelUrl.endsWith('.gltf') && (
+        <pointLight position={[0, 3, 0]} intensity={0.3} />
+      )}
       <group ref={meshRef}>
-        <FallbackModel />
+        {modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf') ? (
+          <GLTFModel url={modelUrl} />
+        ) : (
+          <FallbackModel />
+        )}
       </group>
       <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={5} blur={2} />
       <Environment preset="city" />
@@ -54,13 +38,15 @@ function ModelViewer({ modelUrl }: { modelUrl: string }) {
         maxDistance={8}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 2}
+        autoRotate={autoRotate}
+        autoRotateSpeed={2}
       />
     </Suspense>
   )
 }
 
 function GLTFModel({ url }: { url: string }) {
-  const { scene } = require('@react-three/drei').useGLTF(url)
+  const { scene } = useGLTF(url)
   return <primitive object={scene} scale={1} />
 }
 
@@ -140,14 +126,14 @@ export default function ProductViewer({ modelUrl, productName }: ProductViewerPr
       className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a0a1a] to-[#12122a]"
       style={{ height: isFullscreen ? '100vh' : '500px' }}
     >
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0)
-        }}
-      >
-        <ModelViewer modelUrl={modelUrl || ''} />
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          gl={{ antialias: true, alpha: true }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0)
+          }}
+        >
+          <ModelViewer modelUrl={modelUrl || ''} autoRotate={autoRotate} />
       </Canvas>
 
       <div className="absolute bottom-4 left-4 flex gap-2">

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ShoppingBag, Heart, Search, Menu, X, LogOut, LayoutDashboard, Shield } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+import { LoginModal } from '@/components/auth/LoginModal'
+import { RegisterModal } from '@/components/auth/RegisterModal'
 import { cn, getInitials } from '@/lib/utils'
 import { NAV_LINKS } from '@/lib/constants'
 import { useCartStore } from '@/store/cart-store'
@@ -13,6 +14,8 @@ import { useAuth } from '@/components/auth/AuthContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [showRegister, setShowRegister] = useState(false)
   const { user, logout } = useAuth()
   const totalItems = useCartStore((state) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0)
@@ -142,16 +145,18 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <SignUpButton mode="modal">
-                  <button className="px-4 py-2 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors">
-                    Get Started
-                  </button>
-                </SignUpButton>
-                <SignInButton mode="modal">
-                  <button className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors">
-                    Sign In
-                  </button>
-                </SignInButton>
+                <button
+                  onClick={() => setShowRegister(true)}
+                  className="px-4 py-2 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors"
+                >
+                  Get Started
+                </button>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors"
+                >
+                  Sign In
+                </button>
               </div>
             )}
 
@@ -219,22 +224,26 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="flex flex-col gap-2 pt-2">
-                  <SignInButton mode="modal">
-                    <button className="w-full px-4 py-3 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors">
-                      Sign In
-                    </button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
-                    <button className="w-full px-4 py-3 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors">
-                      Get Started
-                    </button>
-                  </SignUpButton>
+                  <button
+                    onClick={() => { toggleMobileMenu(); setShowLogin(true) }}
+                    className="w-full px-4 py-3 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => { toggleMobileMenu(); setShowRegister(true) }}
+                    className="w-full px-4 py-3 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors"
+                  >
+                    Get Started
+                  </button>
                 </div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} onSwitchToRegister={() => { setShowLogin(false); setShowRegister(true) }} />
+      <RegisterModal isOpen={showRegister} onClose={() => setShowRegister(false)} onSwitchToLogin={() => { setShowRegister(false); setShowLogin(true) }} />
     </motion.nav>
   )
 }

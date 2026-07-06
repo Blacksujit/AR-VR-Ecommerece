@@ -11,11 +11,14 @@ import { Heart, ShoppingCart, Star, Trash2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { cn, formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
+import { useWishlistStore } from '@/store/wishlist-store'
 
 export default function WishlistPage() {
   const { user, isLoading } = useAuthGuard()
   const queryClient = useQueryClient()
   const addItem = useCartStore((s) => s.addItem)
+  const initWishlist = useWishlistStore((s) => s.initItems)
+  const removeFromStore = useWishlistStore((s) => s.removeItem)
 
   const { data: wishlistRes, isLoading: wishlistLoading } = useQuery({
     queryKey: ['wishlist'],
@@ -23,9 +26,17 @@ export default function WishlistPage() {
     enabled: !!user,
   })
 
+  const products = wishlistRes?.data ?? []
+  if (wishlistRes?.data && products.length > 0) {
+    initWishlist(products.map(p => p._id))
+  }
+
   const removeMutation = useMutation({
     mutationFn: (productId: string) => api.delete(`/wishlist/${productId}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['wishlist'] }),
+    onSuccess: (_data, productId) => {
+      removeFromStore(productId)
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] })
+    },
   })
 
   if (isLoading || wishlistLoading) {
@@ -35,8 +46,6 @@ export default function WishlistPage() {
       </div>
     )
   }
-
-  const products = wishlistRes?.data ?? []
 
   return (
     <div className="min-h-screen pt-24 pb-16">

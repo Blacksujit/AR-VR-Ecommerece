@@ -16,7 +16,7 @@ const addressSchema = mongoose.Schema(
 
 const userSchema = mongoose.Schema(
   {
-    clerkId: {
+    firebaseUid: {
       type: String,
       unique: true,
       sparse: true,

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
@@ -37,7 +38,7 @@ import { useCartStore } from '@/store/cart-store'
 import { useWishlistStore } from '@/store/wishlist-store'
 import { useAuth } from '@/components/auth/AuthContext'
 import ProductViewer from '@/components/product/ProductViewer'
-import ARViewer from '@/components/ar-vr/ARViewer'
+const ARViewer = dynamic(() => import('@/components/ar-vr/ARViewer'), { ssr: false })
 import ProductRecommendations from '@/components/product/ProductRecommendations'
 import toast from 'react-hot-toast'
 
@@ -71,9 +72,23 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' })
   const addItem = useCartStore((s) => s.addItem)
-  const { isInWishlist, toggleItem } = useWishlistStore()
+  const { isInWishlist, toggleItem, addItem: addWishlist, removeItem: removeWishlist } = useWishlistStore()
   const { user } = useAuth()
   const imageRef = useRef<HTMLDivElement>(null)
+  const viewerRef = useRef<HTMLDivElement>(null)
+
+  const wishlistMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      if (isInWishlist(productId)) {
+        await api.delete(`/wishlist/${productId}`)
+        removeWishlist(productId)
+      } else {
+        await api.post('/wishlist', { productId })
+        addWishlist(productId)
+      }
+    },
+    onError: () => toast.error('Failed to update wishlist'),
+  })
 
   const { data: apiData, isLoading } = useQuery({
     queryKey: ['product', slug],
@@ -281,7 +296,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 </Button>
 
                 <button
-                  onClick={() => toggleItem(product._id)}
+                  onClick={() => {
+                    if (user) {
+                      wishlistMutation.mutate(product._id)
+                    } else {
+                      toggleItem(product._id)
+                      toast.success(inWishlist ? 'Removed from wishlist' : 'Added to wishlist')
+                    }
+                  }}
                   className={cn('p-4 rounded-xl border transition-all', inWishlist
                     ? 'bg-error/10 border-error/30 text-error'
                     : 'border-white/10 bg-white/5 text-white/60 hover:text-error hover:border-error/30'
@@ -298,13 +320,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               {(product.isARSupported || product.isVRSupported) && (
                 <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-white/10">
                   {product.isARSupported && (
-                    <Button variant="glass" onClick={() => router.push(`/products/${product.slug}?view=ar`)}>
+                    <Button variant="glass" onClick={() => viewerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
                       <Eye className="w-4 h-4" />
                       View in AR
                     </Button>
                   )}
                   {product.isVRSupported && (
-                    <Button variant="glass" onClick={() => router.push('/vr-showroom')}>
+                    <Button variant="glass" onClick={() => window.open('/vr-showroom', '_blank')}>
                       <Box className="w-4 h-4" />
                       View in VR Showroom
                     </Button>
@@ -448,7 +470,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
           <div className="space-y-6">
             <ScrollReveal delay={0.2}>
-              <Card variant="glass" className="p-6 sm:p-8 sticky top-28">
+              <Card variant="glass" className="p-6 sm:p-8 sticky top-28" ref={viewerRef}>
                 <h3 className="text-lg font-semibold text-white mb-4">3D View</h3>
                 <ProductViewer modelUrl={product.modelUrl} productName={product.name} />
                 <div className="mt-4">

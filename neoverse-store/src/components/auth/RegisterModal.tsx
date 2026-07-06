@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSignUp } from '@clerk/nextjs'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth } from '@/lib/firebase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { registerSchema, type RegisterInput } from '@/schemas/auth'
@@ -14,11 +15,11 @@ interface RegisterModalProps {
 }
 
 export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModalProps) {
-  const { signUp, fetchStatus } = useSignUp()
   const [form, setForm] = useState<RegisterInput>({ name: '', email: '', password: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof RegisterInput, string>>>({})
   const [apiError, setApiError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (field: keyof RegisterInput) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [field]: e.target.value }))
@@ -39,42 +40,27 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
       setErrors(fieldErrors)
       return
     }
-    if (fetchStatus === 'fetching') return
+    setIsLoading(true)
 
     try {
-      const { error: createError } = await signUp.create({
-        emailAddress: form.email,
-        password: form.password,
-        firstName: form.name.split(' ')[0],
-        lastName: form.name.split(' ').slice(1).join(' ') || ' ',
-      })
-      if (createError) {
-        setApiError(createError.longMessage || createError.message)
-        return
-      }
-
-      if (signUp.status !== 'complete') {
-        setApiError('Additional verification required.')
-        return
-      }
-
-      const { error: finalizeError } = await signUp.finalize()
-      if (finalizeError) {
-        setApiError(finalizeError.longMessage || finalizeError.message)
-        return
-      }
-
+      const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password)
+      await updateProfile(userCredential.user, { displayName: form.name })
       onClose()
     } catch (err: unknown) {
-      const e = err as { clerkError?: true; message?: string; longMessage?: string; errors?: Array<{ message: string; longMessage?: string }> }
-      let msg = e?.longMessage || e?.message || 'An unexpected error occurred.'
-      if (e?.errors?.[0]) {
-        msg = e.errors[0].longMessage || e.errors[0].message || msg
+      const e = err as { code?: string; message?: string }
+      if (e.code === 'auth/email-already-in-use') {
+        setApiError('An account with this email already exists.')
+      } else if (e.code === 'auth/weak-password') {
+        setApiError('Password is too weak. Use at least 6 characters.')
+      } else if (e.code === 'auth/invalid-email') {
+        setApiError('Please provide a valid email address.')
+      } else if (e.code === 'auth/too-many-requests') {
+        setApiError('Too many attempts. Please try again later.')
+      } else {
+        setApiError(e.message || 'An unexpected error occurred.')
       }
-      if (msg.toLowerCase().includes('captcha') || msg.toLowerCase().includes('bot')) {
-        msg = 'Bot protection blocked sign-up. Please try using the Sign Up page instead.'
-      }
-      setApiError(msg)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -173,8 +159,8 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                 <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
               </p>
 
-              <Button type="submit" className="w-full" size="lg">
-                Create Account
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
 

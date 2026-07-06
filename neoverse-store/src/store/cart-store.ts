@@ -10,6 +10,7 @@ interface CartState {
   clearCart: () => void;
   getTotalItems: () => number;
   getSubtotal: () => number;
+  setItems: (items: CartItem[]) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -51,6 +52,7 @@ export const useCartStore = create<CartState>()(
             total + (item.product.price - (item.product.price * item.product.discount) / 100) * item.quantity,
           0
         ),
+      setItems: (items) => set({ items }),
     }),
     { name: 'neoverse-cart' }
   )

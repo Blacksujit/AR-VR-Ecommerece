@@ -1,13 +1,20 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useCallback, type ReactNode } from 'react'
-import { useUser, useAuth as useClerkAuth } from '@clerk/nextjs'
-import { useQuery } from '@tanstack/react-query'
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import {
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  getIdToken,
+  type User as FirebaseUser,
+} from 'firebase/auth'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { auth } from '@/lib/firebase'
 import { api, type ApiResponse } from '@/lib/api'
-import type { User } from '@/types'
+import type { User, CartItem } from '@/types'
 
 interface AuthState {
   user: User | null
+  firebaseUser: FirebaseUser | null
   isLoading: boolean
   isSignedIn: boolean
   logout: () => Promise<void>
@@ -15,48 +22,89 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
 
-const TOKEN_REFRESH_MS = 10 * 60 * 1000
-
-function buildFallbackUser(clerkUser: NonNullable<ReturnType<typeof useUser>['user']> | null | undefined): User | null {
-  if (!clerkUser) return null
+function buildFallbackUser(firebaseUser: FirebaseUser | null): User | null {
+  if (!firebaseUser) return null
   return {
-    _id: clerkUser.id,
-    name: clerkUser.fullName || clerkUser.primaryEmailAddress?.emailAddress || 'User',
-    email: clerkUser.primaryEmailAddress?.emailAddress || '',
-    avatar: clerkUser.imageUrl || '',
+    _id: firebaseUser.uid,
+    name: firebaseUser.displayName || firebaseUser.email || 'User',
+    email: firebaseUser.email || '',
+    avatar: firebaseUser.photoURL || '',
     role: 'user',
     wishlist: [],
     addresses: [],
-    createdAt: clerkUser.createdAt?.toISOString?.() || new Date().toISOString(),
+    createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { user: clerkUser, isLoaded: clerkLoaded } = useUser()
-  const { getToken, signOut } = useClerkAuth()
-  const getTokenRef = useRef(getToken)
-  getTokenRef.current = getToken
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
+  const [authInitialized, setAuthInitialized] = useState(false)
+  const queryClient = useQueryClient()
 
-  const hasSession = !!clerkUser
+  function setSessionCookie(token: string | null) {
+    if (typeof document === 'undefined') return
+    if (token) {
+      document.cookie = `__session=${token};path=/;max-age=3600;samesite=lax`
+    } else {
+      document.cookie = '__session=;path=/;max-age=0'
+    }
+  }
 
   useEffect(() => {
-    let cancelled = false
-    const refresh = async () => {
-      try {
-        const token = await getTokenRef.current()
-        if (!cancelled) api.setAuthToken(token)
-      } catch {
-        if (!cancelled) api.setAuthToken(null)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setFirebaseUser(user)
+      if (user) {
+        const token = await getIdToken(user)
+        api.setAuthToken(token)
+        setSessionCookie(token)
+      } else {
+        api.setAuthToken(null)
+        setSessionCookie(null)
       }
-    }
-    refresh()
-    api.setFreshTokenFn(() => getTokenRef.current())
-    const interval = setInterval(refresh, TOKEN_REFRESH_MS)
-    return () => {
-      cancelled = true
-      clearInterval(interval)
-    }
-  }, [hasSession])
+      if (!authInitialized) setAuthInitialized(true)
+    })
+    return unsubscribe
+  }, [authInitialized])
+
+  useEffect(() => {
+    api.setFreshTokenFn(async () => {
+      const user = auth.currentUser
+      if (!user) return null
+      const token = await getIdToken(user)
+      setSessionCookie(token)
+      return token
+    })
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const user = auth.currentUser
+      if (!user) return
+      const token = await getIdToken(user, true)
+      setSessionCookie(token)
+    }, 50 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    if (!firebaseUser) return
+    const localCart = localStorage.getItem('neoverse-cart')
+    if (!localCart) return
+    try {
+      const parsed = JSON.parse(localCart)
+      const items: CartItem[] = parsed?.state?.items || []
+      if (items.length > 0) {
+        api.post('/cart/merge', {
+          items: items.map((item) => ({
+            productId: item.product._id,
+            quantity: item.quantity,
+          })),
+        }).catch(() => {})
+      }
+    } catch {}
+  }, [firebaseUser])
+
+  const hasSession = !!firebaseUser
 
   const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ['current-user'],
@@ -66,16 +114,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     staleTime: 30_000,
   })
 
-  const user = profileData?.data ?? (profileLoading ? null : buildFallbackUser(clerkUser))
-  const isLoading = !clerkLoaded || (hasSession && profileLoading && !profileData)
+  const user = profileData?.data ?? (profileLoading ? null : buildFallbackUser(firebaseUser))
+  const isLoading = !authInitialized || (hasSession && profileLoading && !profileData)
 
   const logout = useCallback(async () => {
-    await signOut()
+    await firebaseSignOut(auth)
     api.setAuthToken(null)
-  }, [signOut])
+    setSessionCookie(null)
+    queryClient.removeQueries({ queryKey: ['current-user'] })
+  }, [queryClient])
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isSignedIn: !!hasSession, logout }}>
+    <AuthContext.Provider value={{ user, firebaseUser, isLoading, isSignedIn: !!hasSession, logout }}>
       {children}
     </AuthContext.Provider>
   )

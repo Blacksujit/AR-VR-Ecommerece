@@ -8,7 +8,7 @@ const { AppError } = require('../middleware/errorHandler');
 
 const formatUser = (user) => ({
   _id: user._id,
-  clerkId: user.clerkId,
+  firebaseUid: user.firebaseUid,
   name: user.name,
   email: user.email,
   avatar: user.avatar,

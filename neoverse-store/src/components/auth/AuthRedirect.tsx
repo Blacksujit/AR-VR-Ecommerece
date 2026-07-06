@@ -2,17 +2,17 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from './AuthContext'
 
 export function AuthRedirect() {
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
+    if (!isLoading && isSignedIn) {
       router.replace('/dashboard')
     }
-  }, [isLoaded, isSignedIn, router])
+  }, [isLoading, isSignedIn, router])
 
   return null
 }

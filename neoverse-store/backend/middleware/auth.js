@@ -1,37 +1,70 @@
-const { createClerkClient, verifyToken: clerkVerifyToken } = require('@clerk/backend');
+const path = require('path');
+const { initializeApp, getApps, cert, applicationDefault } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
 const User = require('../models/User');
 const { AppError } = require('./errorHandler');
 
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+if (getApps().length === 0) {
+  const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+  const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
-async function findOrCreateUser(clerkId) {
-  let user = await User.findOne({ clerkId });
+  if (serviceAccountPath) {
+    const resolvedPath = path.isAbsolute(serviceAccountPath)
+      ? serviceAccountPath
+      : path.join(__dirname, '..', serviceAccountPath);
+    const serviceAccount = require(resolvedPath);
+    initializeApp({
+      credential: cert(serviceAccount),
+      projectId: serviceAccount.project_id,
+    });
+  } else if (serviceAccountKey) {
+    const serviceAccount = JSON.parse(
+      Buffer.from(serviceAccountKey, 'base64').toString()
+    );
+    initializeApp({
+      credential: cert(serviceAccount),
+      projectId: serviceAccount.project_id,
+    });
+  } else {
+    initializeApp({
+      credential: applicationDefault(),
+      projectId: 'ar-vr-ecommerce-c84b0',
+    });
+  }
+}
+
+const auth = getAuth();
+
+async function findOrCreateUser(firebaseUid) {
+  let user = await User.findOne({ firebaseUid }).collation({ locale: 'en', strength: 2 });
   if (user) return user;
 
-  let email = `${clerkId}@neoverse.app`;
+  let email = `${firebaseUid}@neoverse.app`;
   let name = 'User';
   let avatar = '';
+  let phone = '';
+
   try {
-    const clerkUser = await clerkClient.users.getUser(clerkId);
-    email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || email;
-    name = clerkUser.fullName || clerkUser.firstName || name;
-    avatar = clerkUser.imageUrl || '';
+    const firebaseUser = await auth.getUser(firebaseUid);
+    email = firebaseUser.email || email;
+    name = firebaseUser.displayName || name;
+    avatar = firebaseUser.photoURL || '';
+    phone = firebaseUser.phoneNumber || '';
   } catch (err) {
-    console.warn(`[Auth] Could not fetch Clerk user ${clerkId}:`, err.message);
+    console.warn(`[Auth] Could not fetch Firebase user ${firebaseUid}:`, err.message);
   }
 
   user = await User.create({
-    clerkId,
+    firebaseUid,
     name,
     email,
     avatar,
+    phone,
     role: 'user',
     wishlist: [],
     addresses: [],
   });
-  console.log(`[Auth] Created MongoDB user ${user._id} for clerkId ${clerkId}`);
+  console.log(`[Auth] Created MongoDB user ${user._id} for firebaseUid ${firebaseUid}`);
   return user;
 }
 
@@ -52,12 +85,13 @@ const protect = async (req, res, next) => {
       return next(new AppError('Authentication required. Please sign in.', 401));
     }
 
-    const { sub } = await clerkVerifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-    req.user = await findOrCreateUser(sub);
+    const decoded = await auth.verifyIdToken(token);
+    req.user = await findOrCreateUser(decoded.uid);
+    req.firebaseUid = decoded.uid;
     next();
   } catch (error) {
-    console.error(`[Auth] Token verification failed:`, error.name || '', error.message || error, error.status ? `status=${error.status}` : '', error.reason ? `reason=${error.reason}` : '');
-    if (error.status === 401) {
+    console.error(`[Auth] Token verification failed:`, error.code || error.message);
+    if (error.code === 'auth/id-token-expired') {
       return next(new AppError('Session expired. Please sign in again.', 401));
     }
     return next(new AppError('Invalid authentication token', 401));
@@ -68,8 +102,9 @@ const optionalAuth = async (req, res, next) => {
   try {
     const token = extractToken(req);
     if (token) {
-      const { sub } = await clerkVerifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-      req.user = await findOrCreateUser(sub);
+      const decoded = await auth.verifyIdToken(token);
+      req.user = await findOrCreateUser(decoded.uid);
+      req.firebaseUid = decoded.uid;
     }
   } catch {
     // Silently continue without auth
@@ -77,11 +112,11 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-const admin = (req, res, next) => {
+const adminOnly = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     return next();
   }
   return next(new AppError('Admin access required', 403));
 };
 
-module.exports = { protect, optionalAuth, admin };
+module.exports = { protect, optionalAuth, admin: adminOnly };
