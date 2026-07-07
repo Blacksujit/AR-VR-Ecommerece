@@ -7,15 +7,30 @@ import { WhyNeoVerse } from '@/components/landing/WhyNeoVerse'
 import { HowARWorks } from '@/components/landing/HowARWorks'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 import { NewsletterSection } from '@/components/landing/NewsletterSection'
+import { serverFetch } from '@/lib/server-api'
+import type { ApiResponse } from '@/lib/api'
+import type { Product, Category } from '@/types'
 
-export default function HomePage() {
+export default async function HomePage() {
+  let featuredData: Product[] = []
+  let categoriesData: (Category & { productCount: number })[] = []
+
+  try {
+    const [featuredRes, catRes] = await Promise.allSettled([
+      serverFetch<ApiResponse<Product[]>>('/products/featured'),
+      serverFetch<ApiResponse<(Category & { productCount: number })[]>>('/categories'),
+    ])
+    if (featuredRes.status === 'fulfilled') featuredData = featuredRes.value.data ?? []
+    if (catRes.status === 'fulfilled') categoriesData = catRes.value.data ?? []
+  } catch {}
+
   return (
     <main>
       <AuthRedirect />
       <HeroSection />
       <TrustedBrands />
-      <CategoriesSection />
-      <FeaturedProducts />
+      <CategoriesSection initialData={categoriesData} />
+      <FeaturedProducts initialData={featuredData} />
       <WhyNeoVerse />
       <HowARWorks />
       <TestimonialsSection />

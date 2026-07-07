@@ -14,7 +14,11 @@ import { useCartStore } from '@/store/cart-store'
 import { cn, formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import type { Product } from '@/types'
 
-export function FeaturedProducts() {
+interface FeaturedProductsProps {
+  initialData?: Product[]
+}
+
+export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
   const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
 
@@ -22,6 +26,7 @@ export function FeaturedProducts() {
     queryKey: ['featured-products'],
     queryFn: () => api.get<ApiResponse<Product[]>>('/products/featured'),
     staleTime: 60_000,
+    initialData: initialData ? { success: true, data: initialData } : undefined,
   })
 
   const products = res?.data ?? []

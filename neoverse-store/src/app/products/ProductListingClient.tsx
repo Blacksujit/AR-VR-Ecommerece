@@ -66,9 +66,11 @@ function getBadge(product: Product): string | null {
 
 interface ProductListingClientProps {
   initialFilters: { [key: string]: string | string[] | undefined }
+  initialData?: Product[]
+  initialPagination?: { total: number; pages: number; page: number; limit: number }
 }
 
-export default function ProductListingClient({ initialFilters }: ProductListingClientProps) {
+export default function ProductListingClient({ initialFilters, initialData, initialPagination }: ProductListingClientProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sort, setSort] = useState('popular')
@@ -114,9 +116,15 @@ export default function ProductListingClient({ initialFilters }: ProductListingC
     return params.toString()
   }, [currentPage, debouncedSearch, selectedCategory, selectedPriceRange, minRating, arOnly, vrOnly, sort])
 
+  const isDefaultFilters = currentPage === 1 && !debouncedSearch && selectedCategory === 'All' && !selectedPriceRange && minRating === 0 && !arOnly && !vrOnly
+
   const { data: apiData, isLoading } = useQuery({
     queryKey: ['products', buildFilters()],
     queryFn: () => api.get<ApiResponse<Product[]>>(`/products?${buildFilters()}`),
+    staleTime: 60_000,
+    ...(isDefaultFilters && initialData && initialPagination
+      ? { initialData: { success: true, data: initialData, pagination: { page: 1, limit: 12, total: initialPagination.total, pages: initialPagination.pages } } }
+      : {}),
   })
 
   const products = apiData?.data ?? []

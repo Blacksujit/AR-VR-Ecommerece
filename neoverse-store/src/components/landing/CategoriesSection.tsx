@@ -49,11 +49,16 @@ const gradientMap: Record<string, string> = {
   'development-kits': 'from-indigo-500/20 to-indigo-500/5',
 }
 
-export function CategoriesSection() {
+interface CategoriesSectionProps {
+  initialData?: (Category & { productCount: number })[]
+}
+
+export function CategoriesSection({ initialData }: CategoriesSectionProps) {
   const { data: res, isLoading } = useQuery({
     queryKey: ['categories'],
     queryFn: () => api.get<ApiResponse<Category[]>>('/categories'),
     staleTime: 120_000,
+    initialData: initialData ? { success: true, data: initialData } : undefined,
   })
 
   const categories = res?.data ?? []
