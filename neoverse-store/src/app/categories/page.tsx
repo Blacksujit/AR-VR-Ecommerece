@@ -1,10 +1,19 @@
 import { CategoriesSection } from '@/components/landing/CategoriesSection'
+import { serverFetch } from '@/lib/server-api'
+import type { ApiResponse } from '@/lib/api'
+import type { Category } from '@/types'
 
 export const metadata = {
   title: 'Categories | NeoVerse Store',
 }
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  let initialCategories: (Category & { productCount: number })[] = []
+  try {
+    const res = await serverFetch<ApiResponse<(Category & { productCount: number })[]>>('/categories')
+    if (res?.data) initialCategories = res.data
+  } catch {}
+
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,7 +26,7 @@ export default function CategoriesPage() {
           </p>
         </div>
       </div>
-      <CategoriesSection />
+      <CategoriesSection initialData={initialCategories} />
     </div>
   )
 }
