@@ -24,6 +24,8 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const resendRoutes = require('./routes/resendRoutes');
 const userRoutes = require('./routes/userRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const { syncProductsAndCategories } = require('./services/externalProductService');
+const Product = require('./models/Product');
 
 const app = express();
 
@@ -96,24 +98,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/cart', cartRoutes);
 
 app.get('/api', (req, res) => {
-  res.json({ message: 'NeoVerse Store API is running' });
+  res.json({ message: 'NeoVerse Store API is running', source: 'DummyJSON' });
 });
 
-// One-time seed endpoint (TODO: remove after seeding)
-app.post('/api/seed', async (req, res) => {
-  if (req.headers['x-seed-key'] !== process.env.SEED_SECRET) {
-    return res.status(401).json({ success: false, message: 'Unauthorized' });
-  }
-  try {
-    const Product = require('./models/Product');
-    const Category = require('./models/Category');
-    await Product.deleteMany({}); await Category.deleteMany({});
-    await require('./seeder').runSeed();
-    res.json({ success: true, message: 'Database seeded' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
+
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
@@ -125,8 +113,20 @@ const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('Connected to MongoDB');
+    const count = await Product.countDocuments();
+    if (count === 0) {
+      console.log('Database empty — syncing from DummyJSON...');
+      try {
+        const result = await syncProductsAndCategories();
+        console.log(`Sync complete: ${result.products} products, ${result.categories} categories`);
+      } catch (err) {
+        console.error('Initial sync failed:', err.message);
+      }
+    } else {
+      console.log(`Database has ${count} products — skipping sync`);
+    }
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
     });
