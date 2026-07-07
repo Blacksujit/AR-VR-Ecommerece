@@ -64,7 +64,7 @@ function getBadge(product: Product): string | null {
   return null
 }
 
-export default function ProductDetailClient({ slug, initialProduct }: { slug: string; initialProduct?: Product | null }) {
+export default function ProductDetailClient({ slug }: { slug: string }) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [quantity, setQuantity] = useState(1)
@@ -96,7 +96,6 @@ export default function ProductDetailClient({ slug, initialProduct }: { slug: st
     staleTime: 120_000,
     retry: 3,
     retryDelay: (i) => Math.min(1000 * 2 ** i, 10000),
-    ...(initialProduct ? { initialData: { success: true, data: initialProduct } } : {}),
   })
 
   const { data: reviewsData } = useQuery({
