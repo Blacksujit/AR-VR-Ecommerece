@@ -99,6 +99,22 @@ app.get('/api', (req, res) => {
   res.json({ message: 'NeoVerse Store API is running' });
 });
 
+// One-time seed endpoint (TODO: remove after seeding)
+app.post('/api/seed', async (req, res) => {
+  if (req.headers['x-seed-key'] !== process.env.SEED_SECRET) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+  try {
+    const Product = require('./models/Product');
+    const Category = require('./models/Category');
+    await Product.deleteMany({}); await Category.deleteMany({});
+    await require('./seeder').runSeed();
+    res.json({ success: true, message: 'Database seeded' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });

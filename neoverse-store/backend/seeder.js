@@ -423,6 +423,13 @@ const categories = [
   { name: 'Development Kits', slug: 'development-kits', image: '/images/categories/development-kits.jpg', description: 'Developer kits for building AR/VR experiences' },
 ];
 
+const runSeed = async () => {
+  await Category.insertMany(categories);
+  await Product.insertMany(products);
+  console.log(`Seeded ${categories.length} categories`);
+  console.log(`Seeded ${products.length} products`);
+};
+
 const seed = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -435,11 +442,7 @@ const seed = async () => {
     await Category.deleteMany({});
     console.log('Cleared existing data');
 
-    await Category.insertMany(categories);
-    await Product.insertMany(products);
-
-    console.log(`Seeded ${categories.length} categories`);
-    console.log(`Seeded ${products.length} products`);
+    await runSeed();
 
     process.exit(0);
   } catch (error) {
@@ -448,4 +451,8 @@ const seed = async () => {
   }
 };
 
-seed();
+if (require.main === module) {
+  seed();
+}
+
+module.exports = { runSeed, products, categories };
