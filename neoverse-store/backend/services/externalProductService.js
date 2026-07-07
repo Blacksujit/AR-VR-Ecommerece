@@ -34,6 +34,9 @@ const syncProductsAndCategories = async () => {
     image: '',
   }));
 
+  const catMap = {};
+  categories.forEach((c) => { catMap[c.slug] = c.name; });
+
   await Category.deleteMany({});
   await Category.insertMany(categories);
   console.log(`Synced ${categories.length} categories`);
@@ -45,7 +48,7 @@ const syncProductsAndCategories = async () => {
       slug: slugify(p.title) + '-' + p.id,
       description: p.description,
       brand: p.brand || 'Generic',
-      category: p.category,
+      category: catMap[p.category] || p.category,
       price: p.price,
       discount: Math.round(p.discountPercentage || 0),
       stock: p.stock || 0,
