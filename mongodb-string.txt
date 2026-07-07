@@ -1,1 +1,0 @@
-mongodb+srv://sujit:WmuIKgjifwXZUnKt@atlascluster.zffjf33.mongodb.net/neoverse

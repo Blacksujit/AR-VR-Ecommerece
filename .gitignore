@@ -147,3 +147,5 @@ dist/
 # Ignore other repositories
 claude-skills/
 .commandcode/
+
+mongodb-string.txt
