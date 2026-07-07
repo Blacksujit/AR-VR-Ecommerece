@@ -5,6 +5,8 @@ const protectedPaths = ['/dashboard', '/admin', '/wishlist', '/checkout']
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
+  if (process.env.NEXT_PUBLIC_API_URL) fetch(process.env.NEXT_PUBLIC_API_URL).catch(() => {})
+
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p))
   if (isProtected) {
     const authToken = req.cookies.get('__session')?.value
