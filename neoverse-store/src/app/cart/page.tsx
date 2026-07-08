@@ -147,7 +147,7 @@ export default function CartPage() {
                 <Button
                   className="w-full"
                   size="lg"
-                  onClick={() => router.push(user ? '/checkout' : '/')}
+                  onClick={() => router.push(user ? '/checkout' : '/sign-in?redirect=/checkout')}
                 >
                   Proceed to Checkout
                   <ArrowRight className="w-4 h-4" />
