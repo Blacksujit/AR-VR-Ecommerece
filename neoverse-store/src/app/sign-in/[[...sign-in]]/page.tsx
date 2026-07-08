@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { Button } from '@/components/ui/button'
@@ -15,11 +16,30 @@ import Link from 'next/link'
 
 export default function SignInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setResetLoading(true)
+    try {
+      await sendPasswordResetEmail(auth, resetEmail)
+      setResetSent(true)
+    } catch {
+      setError('Failed to send reset email. Check the email address.')
+    } finally {
+      setResetLoading(false)
+    }
+  }
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +47,7 @@ export default function SignInPage() {
     setIsLoading(true)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      router.replace('/dashboard')
+      router.replace(redirectTo)
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string }
       if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
@@ -49,7 +69,7 @@ export default function SignInPage() {
       const provider = new GoogleAuthProvider()
       provider.setCustomParameters({ prompt: 'select_account' })
       await signInWithPopup(auth, provider)
-      router.replace('/dashboard')
+      router.replace(redirectTo)
     } catch (err: unknown) {
       const e = err as { code?: string }
       if (e.code !== 'auth/popup-closed-by-user') {
@@ -97,14 +117,24 @@ export default function SignInPage() {
               onChange={(e) => { setPassword(e.target.value); setError('') }}
               required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => { setResetEmail(email); setShowResetModal(true) }}
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
 
           <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
             {isLoading ? 'Signing In...' : 'Sign In'}
@@ -132,6 +162,42 @@ export default function SignInPage() {
           </Link>
         </p>
       </div>
+
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setShowResetModal(false)}>
+          <div className="glass rounded-2xl p-8 max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => { setShowResetModal(false); setResetSent(false) }} className="absolute top-4 right-4 text-white/40 hover:text-white/70">
+              ✕
+            </button>
+            {resetSent ? (
+              <div className="text-center py-4">
+                <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
+                  <Mail className="w-6 h-6 text-success" />
+                </div>
+                <h2 className="text-xl font-display font-bold mb-2">Check your email</h2>
+                <p className="text-sm text-white/60">We sent a password reset link to <strong className="text-white/80">{resetEmail}</strong></p>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordReset}>
+                <h2 className="text-xl font-display font-bold mb-2">Reset Password</h2>
+                <p className="text-sm text-white/60 mb-6">Enter your email and we&apos;ll send you a reset link.</p>
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="you@example.com"
+                  icon={<Mail className="w-4 h-4" />}
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                />
+                <Button type="submit" className="w-full mt-4" disabled={resetLoading}>
+                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                </Button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

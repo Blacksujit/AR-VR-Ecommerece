@@ -12,11 +12,18 @@ interface ARViewerProps {
 export default function ARViewer({ modelUrl, productName, poster }: ARViewerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [modelViewerReady, setModelViewerReady] = useState(false)
   const [supported, setSupported] = useState<'webxr' | 'scene-viewer' | 'quick-look' | null>(null)
 
   useEffect(() => {
-    import('@google/model-viewer')
+    let cancelled = false
+    import('@google/model-viewer').then(() => {
+      if (!cancelled) setModelViewerReady(true)
+    })
+    return () => { cancelled = true }
+  }, [])
 
+  useEffect(() => {
     if (typeof navigator !== 'undefined' && 'xr' in navigator) {
       navigator.xr?.isSessionSupported('immersive-ar').then(supported => {
         if (supported) {

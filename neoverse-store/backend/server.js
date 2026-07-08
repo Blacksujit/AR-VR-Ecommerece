@@ -109,6 +109,10 @@ app.get('/api', (req, res) => {
   res.json({ message: 'NeoVerse Store API is running', source: 'DummyJSON' });
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
 
 
 app.use((req, res) => {
