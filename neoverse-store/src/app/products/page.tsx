@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import ProductListingClient from './ProductListingClient'
 import { serverFetch } from '@/lib/server-api'
 import type { ApiResponse } from '@/lib/api'
-import type { Product } from '@/types'
+import type { Product, Category } from '@/types'
 
 export const metadata = {
   title: 'Products | NeoVerse Store',
@@ -18,11 +18,21 @@ export default async function ProductsPage({
   let initialProducts: Product[] = []
   let initialTotal = 0
   let initialPages = 0
+  let initialCategories: (Category & { productCount: number })[] = []
+
   try {
-    const res = await serverFetch<ApiResponse<Product[]>>('/products?page=1&limit=12')
-    initialProducts = res.data ?? []
-    initialTotal = res.pagination?.total ?? 0
-    initialPages = res.pagination?.pages ?? 0
+    const [prodRes, catRes] = await Promise.allSettled([
+      serverFetch<ApiResponse<Product[]>>('/products?page=1&limit=12'),
+      serverFetch<ApiResponse<(Category & { productCount: number })[]>>('/categories'),
+    ])
+    if (prodRes.status === 'fulfilled') {
+      initialProducts = prodRes.value.data ?? []
+      initialTotal = prodRes.value.pagination?.total ?? 0
+      initialPages = prodRes.value.pagination?.pages ?? 0
+    }
+    if (catRes.status === 'fulfilled') {
+      initialCategories = catRes.value.data ?? []
+    }
   } catch {}
 
   return (
@@ -41,6 +51,7 @@ export default async function ProductsPage({
             initialFilters={params}
             initialData={initialProducts}
             initialPagination={{ total: initialTotal, pages: initialPages, page: 1, limit: 12 }}
+            initialCategories={initialCategories}
           />
         </Suspense>
       </div>

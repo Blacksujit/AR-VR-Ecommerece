@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -15,7 +15,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-import VoiceSearch from '@/components/search/VoiceSearch'
 import { cn, formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,9 +22,7 @@ import { Card } from '@/components/ui/card'
 import { Modal } from '@/components/ui/modal'
 import { api, type ApiResponse } from '@/lib/api'
 import type { Product } from '@/types'
-import { CATEGORIES, ITEMS_PER_PAGE } from '@/lib/constants'
-
-const categories = ['All', ...CATEGORIES.map(c => c.name)]
+import { ITEMS_PER_PAGE } from '@/lib/constants'
 
 const priceRanges = [
   { label: 'Under $100', min: 0, max: 100 },
@@ -64,13 +61,23 @@ function getBadge(product: Product): string | null {
   return null
 }
 
+interface ApiCategory {
+  _id: string
+  name: string
+  slug: string
+  image: string
+  description: string
+  productCount: number
+}
+
 interface ProductListingClientProps {
   initialFilters: { [key: string]: string | string[] | undefined }
   initialData?: Product[]
   initialPagination?: { total: number; pages: number; page: number; limit: number }
+  initialCategories?: ApiCategory[]
 }
 
-export default function ProductListingClient({ initialFilters, initialData, initialPagination }: ProductListingClientProps) {
+export default function ProductListingClient({ initialFilters, initialData, initialPagination, initialCategories }: ProductListingClientProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sort, setSort] = useState('popular')
@@ -84,6 +91,27 @@ export default function ProductListingClient({ initialFilters, initialData, init
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const initialParamApplied = useRef(false)
+
+  const { data: catRes } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => api.get<ApiResponse<ApiCategory[]>>('/categories'),
+    staleTime: 300_000,
+    initialData: initialCategories ? { success: true, data: initialCategories } : undefined,
+  })
+  const categories = ['All', ...(catRes?.data ?? []).map(c => c.name)]
+
+  useEffect(() => {
+    if (initialParamApplied.current) return
+    const initialCategory = initialFilters?.['category']
+    if (initialCategory && typeof initialCategory === 'string' && initialCategory !== 'All') {
+      const matched = catRes?.data?.find(c => c.slug === initialCategory || c.name === initialCategory)
+      if (matched) {
+        setSelectedCategory(matched.name)
+        initialParamApplied.current = true
+      }
+    }
+  }, [initialFilters, catRes])
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handleSearch = useCallback((value: string) => {
