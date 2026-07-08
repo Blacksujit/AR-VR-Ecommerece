@@ -94,16 +94,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     queryKey: ['product', slug],
     queryFn: () => api.get<ApiResponse<Product>>(`/products/${slug}`),
     staleTime: 120_000,
-    retry: 3,
-    retryDelay: (i) => Math.min(1000 * 2 ** i, 10000),
   })
 
   const { data: reviewsData } = useQuery({
     queryKey: ['product-reviews', slug],
     queryFn: () => api.get<{ success: boolean; data: Review[] }>(`/products/${slug}/reviews`),
     staleTime: 120_000,
-    retry: 3,
-    retryDelay: (i) => Math.min(1000 * 2 ** i, 10000),
   })
 
   const reviewMutation = useMutation({
