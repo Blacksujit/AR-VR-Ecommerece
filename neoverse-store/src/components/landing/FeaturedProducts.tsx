@@ -3,19 +3,20 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ShoppingCart, Eye, Star, ArrowRight, Heart } from 'lucide-react'
+import { ShoppingCart, Eye, Star, ArrowRight } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { api, type ApiResponse } from '@/lib/api'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { useCartStore } from '@/store/cart-store'
 import { cn, formatPrice, calculateDiscountedPrice } from '@/lib/utils'
-import type { Product } from '@/types'
+import { PRODUCT_API_BASE } from '@/lib/constants'
+import type { ProductItem } from '@/lib/product-types'
 
 interface FeaturedProductsProps {
-  initialData?: Product[]
+  initialData?: ProductItem[]
 }
 
 export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
@@ -24,8 +25,9 @@ export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['featured-products'],
-    queryFn: () => api.get<ApiResponse<Product[]>>('/products/featured'),
+    queryFn: () => fetch(`${PRODUCT_API_BASE}/products/featured`).then(r => r.json()),
     staleTime: 60_000,
+    retry: 1,
     initialData: initialData ? { success: true, data: initialData } : undefined,
   })
 
@@ -72,18 +74,19 @@ export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => {
+            {products.map((product: ProductItem, index: number) => {
               const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
               return (
                 <ScrollReveal key={product._id} delay={index * 0.1} direction="up">
                   <Card className="group relative overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_0_40px_rgba(91,127,255,0.12)]">
                     <Link href={`/products/${product.slug}`}>
                       <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/10 to-purple/10 flex items-center justify-center overflow-hidden">
-                        {product.images[0] ? (
-                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                        ) : (
-                          <span className="text-5xl font-display font-bold text-white/20">{product.name.charAt(0)}</span>
-                        )}
+                        <ProductImage
+                          src={product.images[0] || ''}
+                          alt={product.name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
 
                         <div className="absolute top-3 left-3 flex flex-col gap-2">
                           {product.featured && <Badge variant="gradient">Featured</Badge>}
@@ -102,7 +105,7 @@ export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
                             size="sm"
                             variant="primary"
                             className="translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100"
-                            onClick={(e) => { e.preventDefault(); addItem(product) }}
+                            onClick={(e) => { e.preventDefault(); addItem(product as unknown as import('@/types').Product) }}
                           >
                             <ShoppingCart className="w-4 h-4" />
                             Add to Cart

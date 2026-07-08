@@ -32,7 +32,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { api, type ApiResponse } from '@/lib/api'
+import { PRODUCT_API_BASE } from '@/lib/constants'
+import type { ProductItem, SingleProductResponse } from '@/lib/product-types'
 import type { Product, Review } from '@/types'
 import { useCartStore } from '@/store/cart-store'
 import { useWishlistStore } from '@/store/wishlist-store'
@@ -51,17 +54,23 @@ const gradientMap: Record<string, string> = {
   'Photography': 'from-amber-600/20 to-orange-600/20',
 }
 
-function getGradient(product: Product): string {
-  return gradientMap[product.category] || 'from-primary/20 to-accent/20'
+function getGradient(category: string): string {
+  return gradientMap[category] || 'from-primary/20 to-accent/20'
 }
 
-function getBadge(product: Product): string | null {
+function getBadge(product: ProductItem): string | null {
   if (product.discount > 20) return 'Hot Deal'
   if (product.featured) return 'Best Seller'
   if (product.newArrival) return 'New'
   if (product.trending) return 'Popular'
   if (product.discount > 0) return `-${product.discount}%`
   return null
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  return res.json()
 }
 
 export default function ProductDetailClient({ slug }: { slug: string }) {
@@ -92,14 +101,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   const { data: apiData, isLoading } = useQuery({
     queryKey: ['product', slug],
-    queryFn: () => api.get<ApiResponse<Product>>(`/products/${slug}`),
+    queryFn: () => fetchJson<SingleProductResponse>(`${PRODUCT_API_BASE}/products/${slug}`),
     staleTime: 120_000,
+    retry: 1,
   })
 
   const { data: reviewsData } = useQuery({
     queryKey: ['product-reviews', slug],
     queryFn: () => api.get<{ success: boolean; data: Review[] }>(`/products/${slug}/reviews`),
     staleTime: 120_000,
+    enabled: !!apiData?.data,
   })
 
   const reviewMutation = useMutation({
@@ -116,6 +127,32 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   })
 
   const product = apiData?.data ?? null
+  const legacyProduct = product ? {
+    _id: product._id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    brand: product.brand,
+    category: product.category,
+    price: product.price,
+    discount: product.discount,
+    stock: product.stock,
+    images: product.images,
+    modelUrl: product.modelUrl || '',
+    specifications: product.specifications,
+    rating: product.rating,
+    numReviews: product.numReviews,
+    isARSupported: product.isARSupported,
+    isVRSupported: product.isVRSupported,
+    aiScore: product.aiScore,
+    featured: product.featured,
+    trending: product.trending,
+    newArrival: product.newArrival,
+    flashSale: product.flashSale,
+    tags: product.tags,
+    createdAt: '',
+    updatedAt: '',
+  } as Product : null
   const reviews = reviewsData?.data ?? []
 
   const handleShare = useCallback(async () => {
@@ -161,7 +198,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   }
 
   const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
-  const gradient = getGradient(product)
+  const gradient = getGradient(product.category)
   const badge = getBadge(product)
   const inWishlist = isInWishlist(product._id)
 
@@ -173,7 +210,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   ]
 
   const handleAddToCart = () => {
-    addItem(product, quantity)
+    if (legacyProduct) addItem(legacyProduct, quantity)
     toast.success(`Added ${product.name} to cart`)
   }
 
@@ -191,13 +228,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
           <div ref={imageRef}>
             <div className={cn('relative aspect-square rounded-3xl bg-gradient-to-br flex items-center justify-center overflow-hidden', gradientVariants[selectedImage])}>
-              {product.images?.[selectedImage] ? (
-                <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-40 h-40 rounded-3xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-7xl font-display font-bold text-white/30">{product.name.charAt(0)}</span>
-                </div>
-              )}
+              <ProductImage
+                src={product.images?.[selectedImage] || ''}
+                alt={product.name}
+                fill
+                className="w-full h-full"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {badge && <Badge variant="gradient">{badge}</Badge>}
                 {product.discount > 0 && <Badge variant="error">-{product.discount}%</Badge>}
@@ -217,13 +255,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   key={i}
                   onClick={() => setSelectedImage(i)}
                   className={cn(
-                    'w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br flex items-center justify-center border-2 transition-all',
+                    'w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br flex items-center justify-center border-2 transition-all relative overflow-hidden',
                     gradientVariants[i] || gradient,
                     selectedImage === i ? 'border-primary' : 'border-transparent hover:border-white/20'
                   )}
                 >
                   {product.images?.[i] ? (
-                    <img src={product.images[i]} alt="" className="w-full h-full object-cover rounded-xl" />
+                    <ProductImage src={product.images[i]} alt="" fill sizes="80px" />
                   ) : (
                     <span className="text-lg font-display font-bold text-white/30">{product.name.charAt(0)}</span>
                   )}

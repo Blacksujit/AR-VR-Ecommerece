@@ -1,8 +1,7 @@
 import { Suspense } from 'react'
 import ProductListingClient from './ProductListingClient'
-import { serverFetch } from '@/lib/server-api'
-import type { ApiResponse } from '@/lib/api'
-import type { Product, Category } from '@/types'
+import { getProducts, getCategories } from '@/lib/services/product-service'
+import type { ProductItem, ProductsResponse, CategoriesResponse } from '@/lib/product-types'
 
 export const metadata = {
   title: 'Products | NeoVerse Store',
@@ -15,20 +14,18 @@ export default async function ProductsPage({
 }) {
   const params = await searchParams
 
-  let initialProducts: Product[] = []
-  let initialTotal = 0
-  let initialPages = 0
-  let initialCategories: (Category & { productCount: number })[] = []
+  let initialData: ProductItem[] = []
+  let initialPagination = { total: 0, pages: 0, page: 1, limit: 12 }
+  let initialCategories: (import('@/lib/product-types').CategoryItem)[] = []
 
   try {
     const [prodRes, catRes] = await Promise.allSettled([
-      serverFetch<ApiResponse<Product[]>>('/products?page=1&limit=12'),
-      serverFetch<ApiResponse<(Category & { productCount: number })[]>>('/categories'),
+      getProducts({ page: 1, limit: 12 }),
+      getCategories(),
     ])
     if (prodRes.status === 'fulfilled') {
-      initialProducts = prodRes.value.data ?? []
-      initialTotal = prodRes.value.pagination?.total ?? 0
-      initialPages = prodRes.value.pagination?.pages ?? 0
+      initialData = prodRes.value.data ?? []
+      initialPagination = prodRes.value.pagination ?? { total: 0, pages: 0, page: 1, limit: 12 }
     }
     if (catRes.status === 'fulfilled') {
       initialCategories = catRes.value.data ?? []
@@ -49,8 +46,8 @@ export default async function ProductsPage({
         <Suspense fallback={<div className="text-center py-20 text-white/40">Loading products...</div>}>
           <ProductListingClient
             initialFilters={params}
-            initialData={initialProducts}
-            initialPagination={{ total: initialTotal, pages: initialPages, page: 1, limit: 12 }}
+            initialData={initialData}
+            initialPagination={initialPagination}
             initialCategories={initialCategories}
           />
         </Suspense>

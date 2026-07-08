@@ -15,17 +15,11 @@ import {
 } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Card } from '@/components/ui/card'
-import { api, type ApiResponse } from '@/lib/api'
+import { PRODUCT_API_BASE } from '@/lib/constants'
+import type { CategoryItem, CategoriesResponse } from '@/lib/product-types'
 import { cn } from '@/lib/utils'
 
-interface Category {
-  _id: string
-  name: string
-  slug: string
-  image: string
-  description: string
-  productCount: number
-}
+type Category = CategoryItem & { productCount: number }
 
 const iconMap: Record<string, LucideIcon> = {
   'vr-headsets': Sparkles,
@@ -50,13 +44,13 @@ const gradientMap: Record<string, string> = {
 }
 
 interface CategoriesSectionProps {
-  initialData?: (Category & { productCount: number })[]
+  initialData?: Category[]
 }
 
 export function CategoriesSection({ initialData }: CategoriesSectionProps) {
-  const { data: res, isLoading } = useQuery({
+  const { data: res, isLoading } = useQuery<CategoriesResponse>({
     queryKey: ['categories'],
-    queryFn: () => api.get<ApiResponse<Category[]>>('/categories'),
+    queryFn: () => fetch(`${PRODUCT_API_BASE}/categories`).then(r => r.json()),
     staleTime: 120_000,
     initialData: initialData ? { success: true, data: initialData } : undefined,
   })

@@ -1,12 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { ShoppingBag, Star, ChevronRight, Package } from 'lucide-react'
-import { api, type ApiResponse } from '@/lib/api'
-import { formatPrice, calculateDiscountedPrice, cn } from '@/lib/utils'
+import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { Product } from '@/types'
+import { ProductImage } from '@/components/ui/ProductImage'
+import { PRODUCT_API_BASE } from '@/lib/constants'
+import type { ProductItem, ProductsResponse } from '@/lib/product-types'
 
 interface ProductRecommendationsProps {
   productId: string
@@ -19,40 +20,24 @@ export default function ProductRecommendations({
   limit = 8,
   title = 'You May Also Like',
 }: ProductRecommendationsProps) {
-  const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products', 'recommendations', productId],
+    queryFn: () =>
+      fetch(`${PRODUCT_API_BASE}/products?limit=${limit + 4}`).then(r => r.json()) as Promise<ProductsResponse>,
+    staleTime: 120_000,
+    retry: 1,
+  })
 
-  useEffect(() => {
-    let mounted = true
-    setIsLoading(true)
-    setError(null)
-
-    api
-      .get<ApiResponse<Product[]>>(`/recommendations?productId=${productId}&limit=${limit}`)
-      .then(res => {
-        if (mounted) {
-          setProducts(Array.isArray(res) ? res : res.data ?? [])
-        }
-      })
-      .catch(err => {
-        if (mounted) setError(err instanceof Error ? err.message : 'Failed to load recommendations')
-      })
-      .finally(() => {
-        if (mounted) setIsLoading(false)
-      })
-
-    return () => {
-      mounted = false
-    }
-  }, [productId, limit])
+  const products = error
+    ? []
+    : (data?.data ?? []).filter(p => p._id !== productId).slice(0, limit)
 
   if (error) {
     return (
       <section className="mt-16" aria-label="Recommended products">
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <p className="text-white/40 text-sm">{error}</p>
+          <p className="text-white/40 text-sm">{(error as Error).message}</p>
         </div>
       </section>
     )
@@ -112,18 +97,12 @@ export default function ProductRecommendations({
                   aria-label={`View ${product.name}`}
                 >
                   <div className="aspect-square bg-white/5 relative overflow-hidden">
-                    {product.images[0] ? (
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Package className="w-10 h-10 text-white/20" />
-                      </div>
-                    )}
+                    <ProductImage
+                      src={product.images[0] || ''}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
                     {product.discount > 0 && (
                       <span className="absolute top-2 left-2 bg-error/90 text-white text-xs font-semibold px-2 py-1 rounded-md">
                         -{product.discount}%

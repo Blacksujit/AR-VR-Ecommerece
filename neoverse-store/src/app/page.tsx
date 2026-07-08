@@ -7,18 +7,17 @@ import { WhyNeoVerse } from '@/components/landing/WhyNeoVerse'
 import { HowARWorks } from '@/components/landing/HowARWorks'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 import { NewsletterSection } from '@/components/landing/NewsletterSection'
-import { serverFetch } from '@/lib/server-api'
-import type { ApiResponse } from '@/lib/api'
-import type { Product, Category } from '@/types'
+import { getFeaturedProducts, getCategories } from '@/lib/services/product-service'
+import type { ProductItem, CategoryItem } from '@/lib/product-types'
 
 export default async function HomePage() {
-  let featuredData: Product[] = []
-  let categoriesData: (Category & { productCount: number })[] = []
+  let featuredData: ProductItem[] = []
+  let categoriesData: (CategoryItem)[] = []
 
   try {
     const [featuredRes, catRes] = await Promise.allSettled([
-      serverFetch<ApiResponse<Product[]>>('/products/featured'),
-      serverFetch<ApiResponse<(Category & { productCount: number })[]>>('/categories'),
+      getFeaturedProducts(8),
+      getCategories(),
     ])
     if (featuredRes.status === 'fulfilled') featuredData = featuredRes.value.data ?? []
     if (catRes.status === 'fulfilled') categoriesData = catRes.value.data ?? []

@@ -20,9 +20,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Modal } from '@/components/ui/modal'
-import { api, type ApiResponse } from '@/lib/api'
-import type { Product } from '@/types'
-import { ITEMS_PER_PAGE } from '@/lib/constants'
+import { ProductImage } from '@/components/ui/ProductImage'
+import { ITEMS_PER_PAGE, PRODUCT_API_BASE } from '@/lib/constants'
+import type { ProductsResponse, CategoryItem } from '@/lib/product-types'
 
 const priceRanges = [
   { label: 'Under $100', min: 0, max: 100 },
@@ -48,11 +48,11 @@ const gradientMap: Record<string, string> = {
   'Photography': 'from-amber-600/20 to-orange-600/20',
 }
 
-function getGradient(product: Product): string {
+function getGradient(product: { category: string }): string {
   return gradientMap[product.category] || 'from-primary/20 to-accent/20'
 }
 
-function getBadge(product: Product): string | null {
+function getBadge(product: { discount: number; featured?: boolean; newArrival?: boolean; trending?: boolean }): string | null {
   if (product.discount > 20) return 'Hot Deal'
   if (product.featured) return 'Best Seller'
   if (product.newArrival) return 'New'
@@ -61,20 +61,17 @@ function getBadge(product: Product): string | null {
   return null
 }
 
-interface ApiCategory {
-  _id: string
-  name: string
-  slug: string
-  image: string
-  description: string
-  productCount: number
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, { next: { revalidate: 300 } })
+  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  return res.json()
 }
 
 interface ProductListingClientProps {
   initialFilters: { [key: string]: string | string[] | undefined }
-  initialData?: Product[]
+  initialData?: import('@/lib/product-types').ProductItem[]
   initialPagination?: { total: number; pages: number; page: number; limit: number }
-  initialCategories?: ApiCategory[]
+  initialCategories?: CategoryItem[]
 }
 
 export default function ProductListingClient({ initialFilters, initialData, initialPagination, initialCategories }: ProductListingClientProps) {
@@ -95,7 +92,7 @@ export default function ProductListingClient({ initialFilters, initialData, init
 
   const { data: catRes } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => api.get<ApiResponse<ApiCategory[]>>('/categories'),
+    queryFn: () => fetchJson<{ success: boolean; data: CategoryItem[] }>(`${PRODUCT_API_BASE}/categories`),
     staleTime: 300_000,
     initialData: initialCategories ? { success: true, data: initialCategories } : undefined,
   })
@@ -148,10 +145,11 @@ export default function ProductListingClient({ initialFilters, initialData, init
 
   const { data: apiData, isLoading } = useQuery({
     queryKey: ['products', buildFilters()],
-    queryFn: () => api.get<ApiResponse<Product[]>>(`/products?${buildFilters()}`),
+    queryFn: () => fetchJson<ProductsResponse>(`${PRODUCT_API_BASE}/products?${buildFilters()}`),
     staleTime: 60_000,
+    retry: 1,
     ...(isDefaultFilters && initialData && initialPagination
-      ? { initialData: { success: true, data: initialData, pagination: { page: 1, limit: 12, total: initialPagination.total, pages: initialPagination.pages } } }
+      ? { initialData: { success: true, data: initialData, pagination: { page: 1, limit: 12, total: initialPagination.total, pages: initialPagination.pages } } as ProductsResponse }
       : {}),
   })
 
@@ -399,9 +397,10 @@ export default function ProductListingClient({ initialFilters, initialData, init
               {products.map((product, index) => {
                 const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
                 const badge = getBadge(product)
+                const showId = product._id || product.slug
                 return (
                   <motion.div
-                    key={product._id}
+                    key={showId}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
@@ -410,13 +409,13 @@ export default function ProductListingClient({ initialFilters, initialData, init
                       <Card variant="glass" className="group relative overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_0_40px_rgba(91,127,255,0.12)]">
                         <Link href={`/products/${product.slug}`}>
                           <div className={cn('relative aspect-[4/3] bg-gradient-to-br flex items-center justify-center overflow-hidden', getGradient(product))}>
-                            {product.images?.[0] ? (
-                              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
-                                <span className="text-2xl font-display font-bold text-white/30">{product.name.charAt(0)}</span>
-                              </div>
-                            )}
+                            <ProductImage
+                              src={product.images?.[0] || ''}
+                              alt={product.name}
+                              fill
+                              className="w-full h-full"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            />
                             <div className="absolute top-3 left-3 flex flex-col gap-2">
                               {badge && <Badge variant="gradient">{badge}</Badge>}
                               {product.discount > 0 && <Badge variant="error">-{product.discount}%</Badge>}
@@ -447,12 +446,14 @@ export default function ProductListingClient({ initialFilters, initialData, init
                     ) : (
                       <Link href={`/products/${product.slug}`}>
                         <Card variant="glass" className="flex gap-5 p-4 group hover:border-primary/30 transition-all duration-300">
-                          <div className={cn('w-28 h-28 shrink-0 rounded-xl bg-gradient-to-br flex items-center justify-center', getGradient(product))}>
-                            {product.images?.[0] ? (
-                              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover rounded-xl" />
-                            ) : (
-                              <span className="text-2xl font-display font-bold text-white/30">{product.name.charAt(0)}</span>
-                            )}
+                          <div className={cn('w-28 h-28 shrink-0 rounded-xl bg-gradient-to-br relative overflow-hidden', getGradient(product))}>
+                            <ProductImage
+                              src={product.images?.[0] || ''}
+                              alt={product.name}
+                              fill
+                              className="w-full h-full"
+                              sizes="112px"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">

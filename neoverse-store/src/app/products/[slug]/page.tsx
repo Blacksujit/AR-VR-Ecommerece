@@ -1,14 +1,11 @@
 import { Suspense } from 'react'
 import ProductDetailClient from './ProductDetailClient'
-import { serverFetch } from '@/lib/server-api'
-import type { ApiResponse } from '@/lib/api'
-import type { Product } from '@/types'
+import { getProducts, getProductBySlug } from '@/lib/services/product-service'
 
 export async function generateStaticParams() {
   try {
-    const res = await serverFetch<ApiResponse<Product[]>>('/products?limit=50')
-    const products = res?.data ?? []
-    return products.map((p) => ({ slug: p.slug }))
+    const res = await getProducts({ limit: 50 })
+    return (res.data ?? []).map((p) => ({ slug: p.slug }))
   } catch {
     return []
   }
@@ -21,7 +18,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params
   try {
-    const res = await serverFetch<ApiResponse<Product>>(`/products/${slug}`)
+    const res = await getProductBySlug(slug)
     const product = res?.data
     if (product) {
       return { title: `${product.name} | NeoVerse Store` }

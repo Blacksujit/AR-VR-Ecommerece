@@ -4,7 +4,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, Float, Text, Center, Html } from '@react-three/drei'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { api, type ApiResponse } from '@/lib/api'
+import { PRODUCT_API_BASE } from '@/lib/constants'
+import type { ProductItem } from '@/lib/product-types'
 import type { Product } from '@/types'
 import { useCartStore } from '@/store/cart-store'
 import { cn, formatPrice } from '@/lib/utils'
@@ -12,17 +13,36 @@ import { Music, ShoppingCart, Eye, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Mesh, Group, type MeshStandardMaterial } from 'three'
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Gaming': '#5b7fff',
-  'Audio': '#00e5ff',
-  'Wearables': '#8b5cf6',
-  'Smart Home': '#22c55e',
-  'Photography': '#f59e0b',
-  'Computing': '#ef4444',
+const TAG_COLORS: Record<string, string> = {
+  'beauty': '#f472b6',
+  'fragrances': '#a78bfa',
+  'furniture': '#f59e0b',
+  'groceries': '#22c55e',
+  'home-decoration': '#f97316',
+  'kitchen-accessories': '#fb923c',
+  'laptops': '#6366f1',
+  'mens-shirts': '#3b82f6',
+  'mens-shoes': '#2563eb',
+  'mens-watches': '#06b6d4',
+  'mobile-accessories': '#8b5cf6',
+  'motorcycle': '#ef4444',
+  'skin-care': '#ec4899',
+  'smartphones': '#5b7fff',
+  'sports-accessories': '#14b8a6',
+  'sunglasses': '#eab308',
+  'tablets': '#8b5cf6',
+  'tops': '#d946ef',
+  'vehicle': '#f97316',
+  'womens-bags': '#a21caf',
+  'womens-dresses': '#db2777',
+  'womens-jewellery': '#f59e0b',
+  'womens-shoes': '#e11d48',
+  'womens-watches': '#0891b2',
 }
 
-function getColor(product: Product): string {
-  return CATEGORY_COLORS[product.category] || '#5b7fff'
+function getColor(product: ProductItem): string {
+  const tag = (product.tags?.[0] || product.category || '').toLowerCase()
+  return TAG_COLORS[tag] || '#5b7fff'
 }
 
 function ProductGeometry({ category, color }: { category: string; color: string }) {
@@ -50,7 +70,7 @@ function ProductGeometry({ category, color }: { category: string; color: string 
   )
 }
 
-function ShowroomProduct({ product, position }: { product: Product; position: [number, number, number] }) {
+function ShowroomProduct({ product, position }: { product: ProductItem; position: [number, number, number] }) {
   const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
   const color = getColor(product)
@@ -79,7 +99,7 @@ function ShowroomProduct({ product, position }: { product: Product; position: [n
               <Eye className="h-3 w-3" />
             </button>
             <button
-              onClick={() => { addItem(product); toast.success(`Added ${product.name}`) }}
+              onClick={() => { addItem(product as unknown as Product); toast.success(`Added ${product.name}`) }}
               className="rounded-lg bg-primary/20 p-1.5 text-primary hover:bg-primary/30 backdrop-blur-sm"
               title="Add to cart"
             >
@@ -115,7 +135,7 @@ function ShowroomLights() {
 function ShowroomContent() {
   const { data, isLoading } = useQuery({
     queryKey: ['products', 'vr'],
-    queryFn: () => api.get<ApiResponse<Product[]>>('/products?limit=10'),
+    queryFn: () => fetch(`${PRODUCT_API_BASE}/products?limit=10`).then(r => r.json()),
   })
 
   if (isLoading) {
@@ -129,7 +149,8 @@ function ShowroomContent() {
     )
   }
 
-  const products = (data?.data || []).slice(0, 8)
+  const res = (data as { success?: boolean; data?: ProductItem[] } | undefined)
+  const products = (res?.data || []).slice(0, 8)
   const positions: [number, number, number][] = [
     [-3, 1, 0], [0, 1, 0], [3, 1, 0],
     [-1.5, 1, 2.5], [1.5, 1, 2.5],
