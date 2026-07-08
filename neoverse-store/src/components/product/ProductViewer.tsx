@@ -51,33 +51,57 @@ function GLTFModel({ url }: { url: string }) {
 }
 
 function FallbackModel() {
-  const meshRef = useRef<Mesh>(null)
+  const groupRef = useRef<Group>(null)
+  const innerRef = useRef<Mesh>(null)
+  const ringRef = useRef<Mesh>(null)
+  const floatOffset = useRef(Math.random() * Math.PI * 2)
 
-  useFrame((_, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.5
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.3
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.8 + floatOffset.current) * 0.15
+    }
+    if (innerRef.current) {
+      innerRef.current.rotation.x += delta * 0.2
+      innerRef.current.rotation.z += delta * 0.1
+    }
+    if (ringRef.current) {
+      ringRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.3
+      ringRef.current.rotation.z += delta * 0.15
     }
   })
 
   return (
-    <mesh ref={meshRef} position={[0, 0.5, 0]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial
-        color="#5B7FFF"
-        metalness={0.6}
-        roughness={0.2}
-        wireframe={false}
-      />
-      <mesh scale={[1.02, 1.02, 1.02]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
+    <group ref={groupRef} position={[0, 0.5, 0]}>
+      <mesh ref={innerRef}>
+        <icosahedronGeometry args={[0.7, 1]} />
+        <meshPhysicalMaterial
           color="#5B7FFF"
-          wireframe
+          metalness={0.7}
+          roughness={0.2}
+          clearcoat={0.3}
           transparent
-          opacity={0.15}
+          opacity={0.9}
         />
       </mesh>
-    </mesh>
+      <mesh scale={[1.15, 1.15, 1.15]}>
+        <icosahedronGeometry args={[0.7, 1]} />
+        <meshStandardMaterial
+          color="#8B5CF6"
+          wireframe
+          transparent
+          opacity={0.2}
+        />
+      </mesh>
+      <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+        <torusGeometry args={[1.1, 0.015, 16, 64]} />
+        <meshBasicMaterial color="#5B7FFF" transparent opacity={0.4} />
+      </mesh>
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[0, 0, 0]}>
+        <torusGeometry args={[1.1, 0.01, 16, 64]} />
+        <meshBasicMaterial color="#8B5CF6" transparent opacity={0.25} />
+      </mesh>
+    </group>
   )
 }
 
