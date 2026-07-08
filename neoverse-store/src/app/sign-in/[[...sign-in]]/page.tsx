@@ -7,6 +7,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   sendPasswordResetEmail,
+  getIdToken,
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { Button } from '@/components/ui/button'
@@ -41,12 +42,20 @@ export default function SignInPage() {
     }
   }
 
+  function setSessionCookie(token: string | null) {
+    if (token) {
+      document.cookie = `__session=${token};path=/;max-age=3600;samesite=lax`
+    }
+  }
+
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setIsLoading(true)
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      const { user } = await signInWithEmailAndPassword(auth, email, password)
+      const token = await getIdToken(user)
+      setSessionCookie(token)
       router.replace(redirectTo)
     } catch (err: unknown) {
       const e = err as { code?: string; message?: string }
@@ -68,7 +77,9 @@ export default function SignInPage() {
     try {
       const provider = new GoogleAuthProvider()
       provider.setCustomParameters({ prompt: 'select_account' })
-      await signInWithPopup(auth, provider)
+      const result = await signInWithPopup(auth, provider)
+      const token = await getIdToken(result.user)
+      setSessionCookie(token)
       router.replace(redirectTo)
     } catch (err: unknown) {
       const e = err as { code?: string }
