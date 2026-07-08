@@ -13,8 +13,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: '*.cloudfront.net' },
-      { protocol: 'https', hostname: '*.githubusercontent.com' },
     ],
     unoptimized: process.env.NODE_ENV === 'development',
   },
