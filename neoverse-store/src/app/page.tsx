@@ -5,7 +5,7 @@ import { CategoriesSection } from '@/components/landing/CategoriesSection'
 import { TrustedBrands } from '@/components/landing/TrustedBrands'
 import { WhyNeoVerse } from '@/components/landing/WhyNeoVerse'
 import { HowARWorks } from '@/components/landing/HowARWorks'
-import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
+
 import { NewsletterSection } from '@/components/landing/NewsletterSection'
 import { getFeaturedProducts, getCategories } from '@/lib/services/product-service'
 import type { ProductItem, CategoryItem } from '@/lib/product-types'
@@ -32,7 +32,7 @@ export default async function HomePage() {
       <FeaturedProducts initialData={featuredData} />
       <WhyNeoVerse />
       <HowARWorks />
-      <TestimonialsSection />
+
       <NewsletterSection />
     </main>
   )

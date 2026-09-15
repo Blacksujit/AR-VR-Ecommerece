@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ShoppingBag, Heart, Search, Menu, X, LogOut, LayoutDashboard, Shield } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LoginModal } from '@/components/auth/LoginModal'
 import { RegisterModal } from '@/components/auth/RegisterModal'
 import { cn, getInitials } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { NAV_LINKS } from '@/lib/constants'
 import { useCartStore } from '@/store/cart-store'
 import { useUIStore } from '@/store/ui-store'
@@ -20,14 +21,37 @@ export default function Navbar() {
   const totalItems = useCartStore((state) =>
     state.items.reduce((sum, item) => sum + item.quantity, 0)
   )
-  const { isSearchOpen, isMobileMenuOpen, toggleSearch, toggleMobileMenu, closeAll } =
-    useUIStore()
+  const { isMobileMenuOpen, toggleSearch, toggleMobileMenu } = useUIStore()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return
+    const menu = mobileMenuRef.current
+    if (!menu) return
+    const focusable = menu.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus() }
+      }
+    }
+    menu.addEventListener('keydown', trap)
+    first?.focus()
+    return () => menu.removeEventListener('keydown', trap)
+  }, [isMobileMenuOpen])
 
   const handleLinkClick = () => {
     if (isMobileMenuOpen) toggleMobileMenu()
@@ -38,11 +62,13 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      role="navigation"
+      aria-label="Main navigation"
       className={cn(
         'fixed top-0 inset-x-0 z-50 transition-all duration-300',
         scrolled
-          ? 'glass border-b border-glass-border shadow-soft'
-          : 'bg-transparent'
+          ? 'border-b border-line bg-ink/90 shadow-soft backdrop-blur-xl'
+          : 'bg-ink/70 backdrop-blur-md'
       )}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -52,8 +78,8 @@ export default function Navbar() {
             className="flex items-center gap-2 shrink-0"
             onClick={handleLinkClick}
           >
-            <span className="text-2xl font-bold tracking-tight gradient-text font-display">
-              NeoVerse
+            <span className="text-xl font-semibold tracking-[-0.03em] text-paper font-display">
+              NeoVerse<span className="text-electric">.</span>
             </span>
           </Link>
 
@@ -62,10 +88,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors group"
+                className="relative px-3 py-2 text-sm font-medium text-muted hover:text-paper transition-colors group"
               >
                 {link.label}
-                <span className="absolute -bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-[calc(100%-2rem)] rounded-full" />
+                <span className="absolute bottom-0 left-3 right-3 h-px origin-left scale-x-0 bg-electric transition-transform duration-200 group-hover:scale-x-100" />
               </Link>
             ))}
           </div>
@@ -73,7 +99,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleSearch}
-              className="p-2.5 rounded-xl text-foreground/70 hover:text-foreground hover:bg-glass-hover transition-colors"
+              className="flex min-h-10 min-w-10 items-center justify-center rounded-control text-muted hover:bg-panel-soft hover:text-paper transition-colors"
               aria-label="Toggle search"
             >
               <Search className="h-5 w-5" />
@@ -81,7 +107,7 @@ export default function Navbar() {
 
             <Link
               href="/wishlist"
-              className="relative p-2.5 rounded-xl text-foreground/70 hover:text-foreground hover:bg-glass-hover transition-colors"
+              className="relative flex min-h-10 min-w-10 items-center justify-center rounded-control text-muted hover:bg-panel-soft hover:text-paper transition-colors"
               aria-label="Wishlist"
             >
               <Heart className="h-5 w-5" />
@@ -89,7 +115,7 @@ export default function Navbar() {
 
             <Link
               href="/cart"
-              className="relative p-2.5 rounded-xl text-foreground/70 hover:text-foreground hover:bg-glass-hover transition-colors"
+              className="relative flex min-h-10 min-w-10 items-center justify-center rounded-control text-muted hover:bg-panel-soft hover:text-paper transition-colors"
               aria-label="Shopping cart"
             >
               <ShoppingBag className="h-5 w-5" />
@@ -99,7 +125,7 @@ export default function Navbar() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary rounded-full"
+                  className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-electric px-1 text-[10px] font-bold text-ink"
                 >
                   {totalItems > 99 ? '99+' : totalItems}
                 </motion.span>
@@ -109,12 +135,12 @@ export default function Navbar() {
             {user ? (
               <div className="relative group">
                 <button
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-electric/30 bg-electric/10 text-sm font-semibold text-electric hover:bg-electric/20 transition-colors"
                   aria-label="User menu"
                 >
                   {getInitials(user.name)}
                 </button>
-                <div className="absolute right-0 top-full mt-2 w-48 glass border border-glass-border rounded-xl shadow-soft opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-1 group-hover:translate-y-0 backdrop-blur-xl">
+                <div className="invisible absolute right-0 top-full mt-2 w-48 translate-y-1 rounded-control border border-line bg-panel/95 opacity-0 shadow-elevated backdrop-blur-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                   <div className="py-2">
                     <Link
                       href="/dashboard"
@@ -145,24 +171,18 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowRegister(true)}
-                  className="px-4 py-2 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors"
-                >
+                <Button variant="outline" size="sm" onClick={() => setShowRegister(true)}>
                   Get Started
-                </button>
-                <button
-                  onClick={() => setShowLogin(true)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors"
-                >
+                </Button>
+                <Button size="sm" onClick={() => setShowLogin(true)}>
                   Sign In
-                </button>
+                </Button>
               </div>
             )}
 
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden p-2.5 rounded-xl text-foreground/70 hover:text-foreground hover:bg-glass-hover transition-colors"
+              className="lg:hidden flex min-h-10 min-w-10 items-center justify-center rounded-control text-muted hover:bg-panel-soft hover:text-paper transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -182,7 +202,8 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="lg:hidden glass border-t border-glass-border overflow-hidden"
+            ref={mobileMenuRef}
+            className="lg:hidden border-t border-line bg-panel/95 overflow-hidden backdrop-blur-xl"
           >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 space-y-1">
               {NAV_LINKS.map((link) => (
@@ -190,7 +211,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={handleLinkClick}
-                  className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-glass-hover rounded-xl transition-colors"
+                  className="block rounded-control px-4 py-3 text-sm font-medium text-muted hover:bg-panel-soft hover:text-paper transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -201,7 +222,7 @@ export default function Navbar() {
                   <Link
                     href="/dashboard"
                     onClick={handleLinkClick}
-                    className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-glass-hover rounded-xl transition-colors"
+                    className="block rounded-control px-4 py-3 text-sm font-medium text-muted hover:bg-panel-soft hover:text-paper transition-colors"
                   >
                     Dashboard
                   </Link>
@@ -209,14 +230,14 @@ export default function Navbar() {
                     <Link
                       href="/admin"
                       onClick={handleLinkClick}
-                      className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-glass-hover rounded-xl transition-colors"
+                      className="block rounded-control px-4 py-3 text-sm font-medium text-muted hover:bg-panel-soft hover:text-paper transition-colors"
                     >
                       Admin
                     </Link>
                   )}
                   <button
                     onClick={() => { logout(); toggleMobileMenu() }}
-                    className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium text-error/80 hover:text-error hover:bg-error/5 rounded-xl transition-colors"
+                    className="flex w-full items-center gap-2 rounded-control px-4 py-3 text-sm font-medium text-error/80 hover:bg-error/10 hover:text-error transition-colors"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout

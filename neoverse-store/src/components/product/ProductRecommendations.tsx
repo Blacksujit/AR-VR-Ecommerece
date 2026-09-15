@@ -1,43 +1,35 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useQuery } from '@tanstack/react-query'
 import { ShoppingBag, Star, ChevronRight, Package } from 'lucide-react'
 import { formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ProductImage } from '@/components/ui/ProductImage'
-import { PRODUCT_API_BASE } from '@/lib/constants'
-import type { ProductItem, ProductsResponse } from '@/lib/product-types'
+import { useRecommendations } from '@/lib/hooks/useProducts'
+
 
 interface ProductRecommendationsProps {
   productId: string
   limit?: number
   title?: string
+  category?: string
 }
 
 export default function ProductRecommendations({
   productId,
   limit = 8,
   title = 'You May Also Like',
+  category,
 }: ProductRecommendationsProps) {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['products', 'recommendations', productId],
-    queryFn: () =>
-      fetch(`${PRODUCT_API_BASE}/products?limit=${limit + 4}`).then(r => r.json()) as Promise<ProductsResponse>,
-    staleTime: 120_000,
-    retry: 1,
-  })
-
-  const products = error
-    ? []
-    : (data?.data ?? []).filter(p => p._id !== productId).slice(0, limit)
+  const { data, isLoading, error } = useRecommendations(category || '', productId, limit)
+  const products = data ?? []
 
   if (error) {
     return (
       <section className="mt-16" aria-label="Recommended products">
-        <div className="text-center py-12">
-          <Package className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <p className="text-white/40 text-sm">{(error as Error).message}</p>
+        <div className="rounded-surface border border-line bg-panel py-12 text-center">
+          <Package className="mx-auto mb-4 h-10 w-10 text-muted/50" />
+          <p className="text-sm text-muted">Unable to load recommendations</p>
         </div>
       </section>
     )
@@ -47,12 +39,12 @@ export default function ProductRecommendations({
     <section className="mt-16" aria-label={title}>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-display font-bold text-white">{title}</h2>
-          <p className="text-white/40 text-sm mt-1">Based on your selection</p>
+          <h2 className="text-2xl font-display font-semibold text-paper">{title}</h2>
+          <p className="mt-1 text-sm text-muted">Based on your selection</p>
         </div>
         <Link
           href="/products"
-          className="hidden sm:flex items-center gap-1 text-primary hover:text-primary-light text-sm font-medium transition-colors"
+          className="hidden items-center gap-1 text-sm font-medium text-electric transition-colors hover:text-primary-light sm:flex"
         >
           View All
           <ChevronRight className="w-4 h-4" />
@@ -62,7 +54,7 @@ export default function ProductRecommendations({
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: limit }).map((_, i) => (
-            <div key={i} className="glass rounded-2xl overflow-hidden">
+            <div key={i} className="overflow-hidden rounded-surface border border-line bg-panel">
               <Skeleton className="aspect-square rounded-none" />
               <div className="p-4 space-y-2">
                 <Skeleton className="h-4 w-3/4" />
@@ -73,9 +65,9 @@ export default function ProductRecommendations({
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-12">
-          <ShoppingBag className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <p className="text-white/40 text-sm">No recommendations available yet</p>
+        <div className="rounded-surface border border-line bg-panel py-12 text-center">
+          <ShoppingBag className="mx-auto mb-4 h-10 w-10 text-muted/50" />
+          <p className="text-sm text-muted">No recommendations available yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -93,10 +85,10 @@ export default function ProductRecommendations({
               >
                 <Link
                   href={`/products/${product.slug}`}
-                  className="group block glass rounded-2xl overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-glow"
+                  className="group block overflow-hidden rounded-surface border border-line bg-panel transition-[border-color,box-shadow] duration-200 hover:border-electric/40 hover:shadow-soft"
                   aria-label={`View ${product.name}`}
                 >
-                  <div className="aspect-square bg-white/5 relative overflow-hidden">
+                  <div className="relative aspect-square overflow-hidden bg-panel-soft">
                     <ProductImage
                       src={product.images[0] || ''}
                       alt={product.name}
@@ -104,35 +96,35 @@ export default function ProductRecommendations({
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                     {product.discount > 0 && (
-                      <span className="absolute top-2 left-2 bg-error/90 text-white text-xs font-semibold px-2 py-1 rounded-md">
+                      <span className="absolute left-2 top-2 rounded-md bg-error px-2 py-1 text-xs font-semibold text-ink">
                         -{product.discount}%
                       </span>
                     )}
                     {product.isVRSupported && (
-                      <span className="absolute top-2 right-2 bg-accent/90 text-black text-xs font-semibold px-2 py-1 rounded-md">
-                        VR
+                      <span className="absolute right-2 top-2 rounded-md bg-accent px-2 py-1 text-xs font-semibold text-ink">
+                        3D
                       </span>
                     )}
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-1 truncate">
+                    <p className="mb-1 truncate text-xs font-medium text-muted">
                       {product.brand}
                     </p>
-                    <h3 className="text-sm font-semibold text-white truncate group-hover:text-primary transition-colors">
+                    <h3 className="truncate text-sm font-semibold text-paper transition-colors group-hover:text-electric">
                       {product.name}
                     </h3>
                     <div className="flex items-center gap-1 mt-1">
-                      <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-                      <span className="text-xs text-white/60">
-                        {product.rating.toFixed(1)} ({product.numReviews})
+                      <Star className="h-3 w-3 fill-warning text-warning" />
+                      <span className="text-xs text-muted">
+                        {product.rating > 0 ? product.rating.toFixed(1) : 'N/A'}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-sm font-bold text-primary">
+                      <span className="text-sm font-semibold tabular-nums text-paper">
                         {formatPrice(discountedPrice ?? product.price)}
                       </span>
                       {product.discount > 0 && (
-                        <span className="text-xs text-white/30 line-through">
+                        <span className="text-xs tabular-nums text-muted/60 line-through">
                           {formatPrice(product.price)}
                         </span>
                       )}
@@ -148,7 +140,7 @@ export default function ProductRecommendations({
       <div className="mt-6 text-center sm:hidden">
         <Link
           href="/products"
-          className="inline-flex items-center gap-1 text-primary hover:text-primary-light text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-medium text-electric transition-colors hover:text-primary-light"
         >
           View All Products
           <ChevronRight className="w-4 h-4" />

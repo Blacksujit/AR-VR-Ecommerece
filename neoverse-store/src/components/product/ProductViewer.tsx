@@ -4,7 +4,7 @@ import { useState, useRef, Suspense, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, ContactShadows, Environment, Html, useProgress, useGLTF } from '@react-three/drei'
 import { Mesh, Group } from 'three'
-import { Loader2, Maximize2, Minimize2, RotateCcw, Expand } from 'lucide-react'
+import { Loader2, Minimize2, RotateCcw, Expand } from 'lucide-react'
 
 function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRotate?: boolean }) {
   const meshRef = useRef<Group>(null)
@@ -20,15 +20,17 @@ function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRo
       <ambientLight intensity={modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf') ? 0.5 : 0.6} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} />
-      {!modelUrl.endsWith('.glb') && !modelUrl.endsWith('.gltf') && (
+      {!modelUrl && <ViewerError message="This product does not have a 3D model yet." />}
+      {modelUrl && !modelUrl.endsWith('.glb') && !modelUrl.endsWith('.gltf') && (
+        <ViewerError message="This product model format is not supported." />
+      )}
+      {modelUrl && !modelUrl.endsWith('.glb') && !modelUrl.endsWith('.gltf') && (
         <pointLight position={[0, 3, 0]} intensity={0.3} />
       )}
       <group ref={meshRef}>
         {modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf') ? (
           <GLTFModel url={modelUrl} />
-        ) : (
-          <FallbackModel />
-        )}
+        ) : null}
       </group>
       <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={5} blur={2} />
       <Environment preset="city" />
@@ -50,11 +52,23 @@ function GLTFModel({ url }: { url: string }) {
   return <primitive object={scene} scale={1} />
 }
 
+function ViewerError({ message }: { message: string }) {
+  return (
+    <Html center>
+      <div className="max-w-48 rounded-lg bg-black/70 px-4 py-3 text-center text-xs text-red-200">
+        {message}
+      </div>
+    </Html>
+  )
+}
+
+/* Kept as a design-only fallback for future explicit preview mode. */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 function FallbackModel() {
   const groupRef = useRef<Group>(null)
   const innerRef = useRef<Mesh>(null)
   const ringRef = useRef<Mesh>(null)
-  const floatOffset = useRef(Math.random() * Math.PI * 2)
+  const floatOffset = useRef(0)
 
   useFrame((state, delta) => {
     if (groupRef.current) {
@@ -104,6 +118,7 @@ function FallbackModel() {
     </group>
   )
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 function Loader() {
   const { progress } = useProgress()
@@ -122,7 +137,7 @@ interface ProductViewerProps {
   productName: string
 }
 
-export default function ProductViewer({ modelUrl, productName }: ProductViewerProps) {
+export default function ProductViewer({ modelUrl }: ProductViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [autoRotate, setAutoRotate] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -147,7 +162,7 @@ export default function ProductViewer({ modelUrl, productName }: ProductViewerPr
   return (
     <div
       ref={containerRef}
-      className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a0a1a] to-[#12122a]"
+      className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-[#0a0a1a] to-[#12122a]"
       style={{ height: isFullscreen ? '100vh' : '500px' }}
     >
         <Canvas

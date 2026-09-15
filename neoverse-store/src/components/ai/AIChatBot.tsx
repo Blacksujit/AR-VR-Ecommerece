@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { useUIStore } from '@/store/ui-store'
+import { cn } from '@/lib/utils'
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -31,6 +33,7 @@ export default function AIChatBot() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { isCartOpen } = useUIStore()
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -38,40 +41,36 @@ export default function AIChatBot() {
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 300)
+      inputRef.current?.focus()
     }
   }, [isOpen])
 
-  const handleSend = async () => {
-    const message = input.trim()
-    if (!message || isLoading) return
+  useEffect(() => {
+    if (isCartOpen && isOpen) {
+      setIsOpen(false)
+    }
+  }, [isCartOpen, isOpen])
 
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return
+    const userMessage = input.trim()
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: message }])
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
     try {
-      const history = messages.slice(1).map(m => ({ role: m.role, content: m.content }))
-      const res = await api.post<{
-        success: boolean
-        data: { response: string; products: ChatMessage['products'] }
-      }>('/ai/chat', { message, history })
-
-      setMessages(prev => [
+      const res = await api.post<{ success: boolean; data: { reply: string; products?: ChatMessage['products'] } }>(
+        '/ai/chat',
+        { message: userMessage }
+      )
+      setMessages((prev) => [
         ...prev,
-        {
-          role: 'assistant',
-          content: res.data.response,
-          products: res.data.products,
-        },
+        { role: 'assistant', content: res.data.reply, products: res.data.products },
       ])
     } catch {
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
-        {
-          role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
-        },
+        { role: 'assistant', content: "Sorry, I couldn't process your request. Please try again or contact support." },
       ])
     } finally {
       setIsLoading(false)
@@ -87,13 +86,15 @@ export default function AIChatBot() {
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#5B7FFF] text-white shadow-lg shadow-[#5B7FFF]/25 transition-all hover:bg-[#4A6FE0] hover:scale-105 active:scale-95"
-        aria-label="Open AI Shopping Assistant"
-      >
-        <MessageCircle className="h-6 w-6" />
-      </button>
+      {!isCartOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
+          aria-label="Open AI Shopping Assistant"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -102,22 +103,22 @@ export default function AIChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-50 flex w-[380px] max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-white/10 bg-[#0a0a1a] shadow-2xl"
+            className="fixed bottom-24 right-6 z-40 flex w-[380px] max-w-[calc(100vw-2rem)] flex-col rounded-2xl border border-glass-border bg-background/95 backdrop-blur-xl shadow-2xl"
             style={{ maxHeight: 'min(600px, calc(100vh - 120px))' }}
           >
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5B7FFF]/20">
-                  <Bot className="h-4 w-4 text-[#5B7FFF]" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20">
+                  <Bot className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-white">AI Assistant</h3>
-                  <p className="text-[10px] text-gray-400">Powered by AI</p>
+                  <p className="text-[10px] text-white/40">Powered by AI</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/5 hover:text-white"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
@@ -130,42 +131,26 @@ export default function AIChatBot() {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                       msg.role === 'user'
-                        ? 'bg-[#5B7FFF] text-white'
-                        : 'bg-white/5 text-gray-200'
+                        ? 'bg-primary text-white'
+                        : 'bg-white/5 text-white/90'
                     }`}
                   >
                     <div className="flex items-start gap-2">
                       {msg.role === 'assistant' && (
-                        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#5B7FFF]" />
+                        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
                       )}
                       <div>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                         {msg.products && msg.products.length > 0 && (
                           <div className="mt-2 space-y-1.5">
-                            {msg.products.slice(0, 3).map(product => (
+                            {msg.products.map((p) => (
                               <a
-                                key={product._id}
-                                href={`/products/${product.slug}`}
-                                className="flex items-center gap-2 rounded-lg bg-white/10 p-2 text-xs transition-colors hover:bg-white/20"
+                                key={p._id}
+                                href={`/products/${p.slug}`}
+                                className="block glass rounded-xl p-2 hover:border-primary/30 transition-all"
                               >
-                                {product.images?.[0] && (
-                                  <img
-                                    src={product.images[0]}
-                                    alt={product.name}
-                                    className="h-8 w-8 rounded object-cover"
-                                  />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-white truncate">{product.name}</p>
-                                  <p className="text-gray-400">
-                                    ${product.discount > 0
-                                      ? (product.price * (1 - product.discount / 100)).toFixed(2)
-                                      : product.price.toFixed(2)}
-                                    {product.discount > 0 && (
-                                      <span className="ml-1 text-green-400">-{product.discount}%</span>
-                                    )}
-                                  </p>
-                                </div>
+                                <p className="text-xs font-medium text-white/90">{p.name}</p>
+                                <p className="text-xs text-primary">${p.price.toFixed(2)}</p>
                               </a>
                             ))}
                           </div>
@@ -177,35 +162,41 @@ export default function AIChatBot() {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl bg-white/5 px-4 py-3">
-                    <Loader2 className="h-5 w-5 animate-spin text-[#5B7FFF]" />
+                  <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-white/5">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <p className="text-sm text-white/60">Thinking...</p>
+                    </div>
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="border-t border-white/10 p-3">
-              <div className="flex items-center gap-2">
+            <div className="border-t border-white/10 px-4 py-3">
+              <div className="flex items-center gap-2 glass rounded-xl px-3 py-1.5 border border-white/10">
                 <input
                   ref={inputRef}
                   type="text"
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about products..."
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none transition-colors focus:border-[#5B7FFF]/50"
-                  disabled={isLoading}
+                  className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
+                  aria-label="Chat message"
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B7FFF] text-white transition-all hover:bg-[#4A6FE0] disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Send"
+                  disabled={isLoading || !input.trim()}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Send message"
                 >
                   <Send className="h-4 w-4" />
                 </button>
               </div>
+              <p className="text-[10px] text-white/30 mt-1.5 text-center">
+                AI responses are generated and may not be accurate
+              </p>
             </div>
           </motion.div>
         )}

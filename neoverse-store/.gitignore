@@ -45,6 +45,7 @@ next-env.d.ts
 
 # AI agent files
 .agents/
+.opencode/*.local.json
 AGENTS.md
 CLAUDE.md
 skills-lock.json

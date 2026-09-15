@@ -1,78 +1,79 @@
 'use client'
 
-import { Search, Smartphone, Camera, ShoppingBag, type LucideIcon } from 'lucide-react'
+import { Camera, Ruler, ShieldCheck, type LucideIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { cn } from '@/lib/utils'
+
 
 interface Step {
   number: string
   icon: LucideIcon
-  title: string
-  description: string
+  doubt: string
+  resolution: string
 }
 
 const steps: Step[] = [
   {
     number: '01',
-    icon: Search,
-    title: 'Browse Products',
-    description: 'Explore our curated catalog of cutting-edge products across all categories.',
+    icon: Camera,
+    doubt: 'Will the color match my room?',
+    resolution:
+      'Point your camera and the product renders in your actual lighting. See the true shade, not a studio photo.',
   },
   {
     number: '02',
-    icon: Smartphone,
-    title: "Tap 'View in AR'",
-    description: 'Select any AR-enabled product and tap the AR button to launch the experience.',
+    icon: Ruler,
+    doubt: 'Will it fit in that corner?',
+    resolution:
+      'Place the 3D model at true scale. Walk around it, move it, adjust — before you commit a cent.',
   },
   {
     number: '03',
-    icon: Camera,
-    title: 'Place in Your Space',
-    description: 'Point your camera and see the product come to life in your real environment.',
-  },
-  {
-    number: '04',
-    icon: ShoppingBag,
-    title: 'Purchase',
-    description: 'Love what you see? Add to cart and checkout with complete confidence.',
+    icon: ShieldCheck,
+    doubt: 'What if it looks different in person?',
+    resolution:
+      "You've already seen it in your space from every angle. Buy with confidence — no surprises, no 'not what I expected' returns.",
   },
 ]
 
 export function HowARWorks() {
   return (
-    <section className="relative py-24 sm:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.04)_0%,transparent_60%)]" />
+    <section className="relative border-b border-line py-20 sm:py-28 overflow-hidden">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold">
-              How <span className="gradient-text">AR Shopping</span> Works
+            <p className="mb-3 text-sm font-medium text-electric">A simpler way to decide</p>
+            <h2 className="text-3xl font-display font-semibold tracking-tight text-paper sm:text-4xl lg:text-5xl">
+              See the answer in your space.
             </h2>
-            <p className="mt-4 text-white/50 text-lg max-w-xl mx-auto">
-              Experience products like never before — right from your phone
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+              Every product page removes the single biggest doubt — fit, scale, or
+              material — before you add to cart.
             </p>
           </div>
         </ScrollReveal>
 
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           <div className="flex-1 relative max-w-md mx-auto lg:mx-0">
-            <div className="relative aspect-[9/16] max-w-[280px] mx-auto">
-              <div className="absolute inset-0 rounded-[40px] bg-gradient-to-br from-primary/20 via-purple/10 to-accent/10 animate-pulse-glow" />
-              <div className="relative inset-4 rounded-[32px] glass overflow-hidden flex flex-col items-center justify-center p-6" style={{ margin: 16 }}>
-                <Camera className="w-10 h-10 text-primary-light mb-4" />
-                <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4">
+            <div className="relative aspect-9/16 max-w-70 mx-auto">
+              <div className="absolute inset-0 rounded-[40px] border border-electric/20 bg-panel shadow-glow" />
+              <div
+                className="relative inset-4 flex flex-col items-center justify-center overflow-hidden rounded-4xl border border-line bg-panel p-6"
+                style={{ margin: 16 }}
+              >
+                <Camera className="mb-4 h-10 w-10 text-electric" />
+                <div className="mb-4 flex aspect-square w-full items-center justify-center rounded-surface border border-line bg-panel-soft">
                   <div className="text-center">
-                    <div className="w-16 h-16 mx-auto rounded-xl bg-white/10 flex items-center justify-center mb-2">
-                      <Smartphone className="w-8 h-8 text-white/60" />
+                    <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-control border border-line bg-panel">
+                      <Ruler className="h-8 w-8 text-electric" />
                     </div>
-                    <p className="text-xs text-white/30">AR Preview</p>
+                    <p className="text-xs text-muted">True scale</p>
                   </div>
                 </div>
                 <div className="w-full space-y-2">
-                  <div className="h-2 rounded-full bg-white/10" />
-                  <div className="h-2 rounded-full bg-white/5 w-2/3" />
+                  <div className="h-2 rounded-full bg-panel-soft" />
+                  <div className="h-2 w-2/3 rounded-full bg-panel-soft" />
                 </div>
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
                   <div className="w-24 h-1 rounded-full bg-white/20" />
@@ -97,24 +98,24 @@ export function HowARWorks() {
                       viewport={{ once: true }}
                     >
                       <div className="flex flex-col items-center">
-                        <div className="w-14 h-14 rounded-2xl glass flex items-center justify-center shrink-0 relative z-10 group-hover:border-primary/30 transition-colors duration-300">
-                          <Icon className="w-6 h-6 text-primary-light" />
+                        <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-control border border-line bg-panel">
+                          <Icon className="h-6 w-6 text-electric" />
                         </div>
                         {!isLast && (
-                          <div className="w-px flex-1 mt-2 bg-gradient-to-b from-primary/30 to-transparent" />
+                          <div className="mt-2 w-px flex-1 bg-linear-to-b from-electric/40 to-transparent" />
                         )}
                       </div>
 
-                      <div className="pt-3">
-                        <span className="text-xs text-primary-light/60 font-mono">
+                      <div className="pt-1">
+                        <span className="text-xs font-medium text-electric/70">
                           Step {step.number}
                         </span>
-                        <h3 className="text-xl font-display font-semibold text-white mt-1">
-                          {step.title}
-                        </h3>
-                        <p className="text-white/50 mt-2 leading-relaxed max-w-md">
-                          {step.description}
+                        <p className="mt-1 text-sm italic text-muted">
+                          &ldquo;{step.doubt}&rdquo;
                         </p>
+                        <h3 className="mt-1 font-display text-xl font-semibold text-paper">
+                          {step.resolution}
+                        </h3>
                       </div>
                     </motion.div>
                   </ScrollReveal>

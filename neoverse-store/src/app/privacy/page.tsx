@@ -8,14 +8,12 @@ export default function PrivacyPage() {
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-6">
-              <Shield className="w-8 h-8 text-primary" />
+          <div className="mb-12 max-w-2xl">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft">
+              <Shield className="h-6 w-6 text-electric" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-              Privacy <span className="gradient-text">Policy</span>
-            </h1>
-            <p className="text-white/60">Last updated: January 2026</p>
+            <h1 className="text-4xl font-display font-medium tracking-tight md:text-5xl">Privacy policy</h1>
+            <p className="mt-4 text-muted">Last updated: January 2026</p>
           </div>
         </ScrollReveal>
 

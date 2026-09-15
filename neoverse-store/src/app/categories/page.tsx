@@ -17,13 +17,10 @@ export default async function CategoriesPage() {
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-4">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-            Browse by <span className="gradient-text">Category</span>
-          </h1>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Discover products across all our categories
-          </p>
+        <div className="mb-4 max-w-2xl">
+          <p className="text-sm text-muted">Browse the collection</p>
+          <h1 className="mt-2 text-4xl font-display font-medium tracking-tight md:text-5xl">Find the right object for your space</h1>
+          <p className="mt-4 text-base leading-7 text-muted">Start with the way you live, work, listen, or make.</p>
         </div>
       </div>
       <CategoriesSection initialData={initialCategories} />

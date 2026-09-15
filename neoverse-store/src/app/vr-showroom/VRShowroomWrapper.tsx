@@ -13,13 +13,10 @@ export default function VRShowroomWrapper() {
       <VRShowroomScene />
 
       <section>
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-display font-bold">
-            <span className="gradient-text">Explore More Products</span>
-          </h2>
-          <p className="text-white/50 mt-2 max-w-xl mx-auto">
-            Discover other items you might love, recommended just for you
-          </p>
+        <div className="mb-8 max-w-xl">
+          <p className="text-sm text-muted">Keep inspecting</p>
+          <h2 className="mt-2 text-2xl font-display font-medium md:text-3xl">More objects from the collection</h2>
+          <p className="mt-3 text-sm leading-6 text-muted">Compare another object without leaving the showroom.</p>
         </div>
         <ProductRecommendations productId="vr-showroom" limit={8} title="" />
       </section>

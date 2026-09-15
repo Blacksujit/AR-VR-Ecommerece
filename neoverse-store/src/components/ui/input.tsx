@@ -7,26 +7,38 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({ className, label, error, icon, ...props }, ref) => {
+const Input = forwardRef<HTMLInputElement, InputProps>(({ className, label, error, icon, id, ...props }, ref) => {
+  const inputId = id || (label ? label.toLowerCase().replace(/[^a-z0-9]+/g, '-') : undefined)
+  const errorId = error && inputId ? `${inputId}-error` : undefined
+
   return (
     <div className="space-y-2">
-      {label && <label className="block text-sm font-medium text-white/80">{label}</label>}
+      {label && (
+        <label htmlFor={inputId} className="block text-sm font-medium text-paper">
+          {label}
+        </label>
+      )}
       <div className="relative">
-        {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">{icon}</div>}
+        {icon && <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" aria-hidden="true">{icon}</div>}
         <input
+          {...props}
+          id={inputId}
           ref={ref}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={errorId}
           className={cn(
-            'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 transition-all duration-300 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20',
-            icon && 'pl-12',
-            error && 'border-error/50 focus:border-error/50 focus:ring-error/20',
+            'min-h-11 w-full rounded-control border border-line bg-panel-soft px-4 py-3 text-paper placeholder:text-muted/70 transition-[border-color,box-shadow] duration-200 focus:border-electric focus:outline-none focus:ring-2 focus:ring-electric/20 disabled:cursor-not-allowed disabled:opacity-50',
+            icon && 'pl-11',
+            error && 'border-error focus:border-error focus:ring-error/20',
             className
           )}
-          {...props}
         />
       </div>
-      {error && <p className="text-sm text-error">{error}</p>}
+      {error && <p id={errorId} className="text-sm text-error" role="alert">{error}</p>}
     </div>
   )
 })
+
 Input.displayName = 'Input'
+
 export { Input }

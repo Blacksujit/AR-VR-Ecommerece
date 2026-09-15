@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Loader2, Maximize2, X, Smartphone } from 'lucide-react'
+import { Loader2, X, Smartphone } from 'lucide-react'
 
 interface ARViewerProps {
   modelUrl?: string
@@ -24,25 +24,31 @@ export default function ARViewer({ modelUrl, productName, poster }: ARViewerProp
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent
+    const fallback = /Android/i.test(userAgent)
+      ? 'scene-viewer'
+      : /iPhone|iPad|iPod/i.test(userAgent)
+        ? 'quick-look'
+        : null
+
     if (typeof navigator !== 'undefined' && 'xr' in navigator) {
-      navigator.xr?.isSessionSupported('immersive-ar').then(supported => {
-        if (supported) {
-          setSupported('webxr')
-          return
-        }
-      }).catch(() => {})
-    }
-
-    const isAndroid = /Android/i.test(navigator.userAgent)
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-
-    if (isAndroid) {
-      setSupported('scene-viewer')
-    } else if (isIOS) {
-      setSupported('quick-look')
+      navigator.xr?.isSessionSupported('immersive-ar').then((isSupported) => {
+        if (!cancelled && isSupported) setSupported('webxr')
+      }).catch(() => {
+        if (!cancelled) setSupported(fallback)
+      })
     } else {
-      setSupported(null)
+      const timer = window.setTimeout(() => {
+        if (!cancelled) setSupported(fallback)
+      }, 0)
+      return () => {
+        cancelled = true
+        window.clearTimeout(timer)
+      }
     }
+
+    return () => { cancelled = true }
   }, [])
 
   if (!modelUrl) {
@@ -55,7 +61,7 @@ export default function ARViewer({ modelUrl, productName, poster }: ARViewerProp
   }
 
   const openAR = () => {
-    if (!modelUrl) return
+    if (!modelUrl || !modelViewerReady) return
 
     if (supported === 'scene-viewer') {
       const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(
@@ -77,19 +83,22 @@ export default function ARViewer({ modelUrl, productName, poster }: ARViewerProp
     <>
       <button
         onClick={openAR}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#5B7FFF] to-[#8B5CF6] px-4 py-3 font-medium text-white transition-all hover:opacity-90 active:scale-[0.98]"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#5B7FFF] to-[#8B5CF6] px-4 py-3 font-medium text-white transition-all hover:opacity-90 active:scale-[0.98]"
       >
         <Smartphone className="h-4 w-4" />
         View in Your Space
-        {supported && (
+        {supported && modelViewerReady && (
           <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px]">
             {supported === 'webxr' ? 'WebXR' : supported === 'scene-viewer' ? 'ARCore' : 'AR Quick Look'}
           </span>
         )}
+        {!modelViewerReady && (
+          <Loader2 className="h-4 w-4 animate-spin" aria-label="Preparing AR viewer" />
+        )}
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/90">
           <button
             onClick={() => setIsOpen(false)}
             className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"

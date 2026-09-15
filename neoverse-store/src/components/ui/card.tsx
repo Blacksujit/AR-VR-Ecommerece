@@ -5,14 +5,16 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'glass' | 'glow'
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(({ className, variant = 'glass', ...props }, ref) => {
+const Card = forwardRef<HTMLDivElement, CardProps>(({ className, variant = 'default', ...props }, ref) => {
   const variants = {
-    default: 'bg-surface border border-border rounded-2xl',
-    glass: 'glass rounded-2xl',
-    glow: 'glass rounded-2xl glow',
+    default: 'rounded-surface border border-line bg-panel',
+    glass: 'rounded-surface border border-line bg-panel/85 backdrop-blur-xl',
+    glow: 'rounded-surface border border-electric/25 bg-panel shadow-glow',
   }
+
   return <div ref={ref} className={cn(variants[variant], className)} {...props} />
 })
+
 Card.displayName = 'Card'
 
 export { Card }

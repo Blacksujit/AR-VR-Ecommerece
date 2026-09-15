@@ -15,13 +15,10 @@ export default function AboutPage() {
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
-              About <span className="gradient-text">NeoVerse</span>
-            </h1>
-            <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              We are building the future of shopping — where the physical and digital worlds converge.
-            </p>
+          <div className="mb-16 max-w-2xl">
+            <p className="text-sm text-muted">Why NeoVerse exists</p>
+            <h1 className="mt-2 text-4xl font-display font-medium tracking-tight md:text-6xl">See the object before it arrives.</h1>
+            <p className="mt-5 text-lg leading-8 text-muted">NeoVerse helps people make more confident decisions about objects that are difficult to judge from a flat product photo.</p>
           </div>
         </ScrollReveal>
 
@@ -41,8 +38,8 @@ export default function AboutPage() {
           {values.map(({ icon: Icon, title, desc }, i) => (
             <ScrollReveal key={title} delay={i * 0.1}>
               <Card className="p-6 hover:border-primary/30 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-primary" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft">
+                  <Icon className="h-6 w-6 text-electric" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{title}</h3>
                 <p className="text-white/50 text-sm leading-relaxed">{desc}</p>

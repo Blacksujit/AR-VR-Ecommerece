@@ -15,17 +15,18 @@ export default function ReturnsPage() {
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-center">
-            Returns & <span className="gradient-text">Exchanges</span>
-          </h1>
-          <p className="text-white/60 text-center mb-12">Hassle-free returns within 30 days</p>
+          <div className="mb-12 max-w-2xl">
+            <p className="text-sm text-muted">After delivery</p>
+            <h1 className="mt-2 text-4xl font-display font-medium tracking-tight md:text-5xl">Returns and exchanges</h1>
+            <p className="mt-4 text-base leading-7 text-muted">What to expect if an object is not right for your space.</p>
+          </div>
         </ScrollReveal>
         <div className="grid md:grid-cols-2 gap-6">
           {steps.map(({ icon: Icon, title, desc }, i) => (
             <ScrollReveal key={title} delay={i * 0.1}>
               <Card className="p-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-primary" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft">
+                  <Icon className="h-6 w-6 text-electric" />
                 </div>
                 <h3 className="font-semibold mb-1">{title}</h3>
                 <p className="text-white/50 text-sm">{desc}</p>

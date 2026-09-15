@@ -1,0 +1,72 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": [
+      "C:\\Users\\Sujit Nirmal\\.claude\\skills",
+      "C:\\Users\\Sujit Nirmal\\.agents\\skills",
+      "C:\\Users\\Sujit Nirmal\\.agents\\skills\\ai-engineer",
+      "C:\\Users\\Sujit Nirmal\\.agents\\skills\\frontend-design",
+      "C:\\Users\\Sujit Nirmal\\.agents\\skills\\principal-software-architect",
+      "C:\\Users\\Sujit Nirmal\\.agents\\skills\\system-design"
+    ]
+  },
+  "mcp": {
+    "render": {
+      "type": "remote",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${RENDER_MCP_TOKEN}"
+      },
+      "enabled": true
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com",
+      "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=ppeegiwpdtqbrluwahkb",
+      "enabled": true
+    },
+    "claude-code-docs": {
+      "type": "remote",
+      "url": "https://code.claude.com/docs/mcp",
+      "enabled": true
+    },
+    "21st": {
+      "type": "remote",
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${TWENTY_FIRST_API_KEY}"
+      },
+      "enabled": true
+    },
+    "chrome-devtools-mcp": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@latest"],
+      "enabled": true
+    },
+    "gumroad": {
+      "type": "local",
+      "command": ["npx", "-y", "gumroad-mcp@latest"],
+      "environment": {
+        "GUMROAD_ACCESS_TOKEN": "${GUMROAD_ACCESS_TOKEN}"
+      },
+      "enabled": true
+    }
+  }
+}

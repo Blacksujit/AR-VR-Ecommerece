@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react'
 
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const rafRef = useRef<number>(0)
+  const isVisibleRef = useRef(true)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -53,8 +55,9 @@ export function ParticleBackground() {
           }
         }
       }
-      requestAnimationFrame(animate)
+      rafRef.current = requestAnimationFrame(animate)
     }
+
     animate()
 
     const handleResize = () => {
@@ -62,7 +65,25 @@ export function ParticleBackground() {
       canvas.height = window.innerHeight
     }
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+        if (entry.isIntersecting) {
+          rafRef.current = requestAnimationFrame(animate)
+        } else {
+          cancelAnimationFrame(rafRef.current)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(canvas)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      observer.disconnect()
+      cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />

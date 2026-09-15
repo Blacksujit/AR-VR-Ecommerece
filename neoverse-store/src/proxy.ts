@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isProtectedPath } from '@/lib/route-policy'
 
-const protectedPaths = ['/dashboard', '/admin', '/wishlist', '/checkout']
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  if (apiUrl) {
-    fetch(apiUrl.replace('/api', '/api/health')).catch(() => {})
-  }
-
-  const isProtected = protectedPaths.some((p) => pathname.startsWith(p))
+  const isProtected = isProtectedPath(pathname)
   if (isProtected) {
     const authToken = req.cookies.get('__session')?.value
     if (!authToken) {

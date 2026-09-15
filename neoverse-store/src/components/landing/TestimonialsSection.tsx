@@ -74,13 +74,10 @@ export function TestimonialsSection() {
     <section className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold">
-              What Our <span className="gradient-text">Community Says</span>
-            </h2>
-            <p className="mt-4 text-white/50 text-lg max-w-xl mx-auto">
-              Join thousands of satisfied shoppers experiencing the future of retail
-            </p>
+          <div className="mb-16 max-w-2xl">
+            <p className="text-sm text-muted">How the experience feels</p>
+            <h2 className="mt-2 text-3xl font-display font-medium tracking-tight sm:text-4xl lg:text-5xl">Confidence after inspection.</h2>
+            <p className="mt-4 text-lg leading-8 text-muted">Product confidence should come from inspectable details, not invented praise.</p>
           </div>
         </ScrollReveal>
 

@@ -31,33 +31,25 @@ export function NewsletterSection() {
 
   return (
     <section className="relative py-24 sm:py-32">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(91,127,255,0.06)_0%,transparent_70%)]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="relative overflow-hidden rounded-3xl p-1 gradient-border">
-            <div className="relative rounded-[23px] bg-background overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,229,255,0.05)_0%,transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(91,127,255,0.05)_0%,transparent_50%)]" />
-
-              <div className="relative z-10 px-8 py-16 sm:px-16 sm:py-20 lg:px-24 lg:py-24 text-center">
+          <div className="rounded-surface border border-line bg-panel">
+            <div className="px-8 py-16 sm:px-16 sm:py-20 lg:px-24 lg:py-24">
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
                   viewport={{ once: true }}
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-8 animate-float">
-                    <Mail className="w-8 h-8 text-primary-light" />
+                  <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft">
+                    <Mail className="h-5 w-5 text-electric" />
                   </div>
 
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold">
-                    Stay Ahead of the{' '}
-                    <span className="gradient-text">Future</span>
-                  </h2>
+                  <h2 className="max-w-xl text-3xl font-display font-medium tracking-tight sm:text-4xl lg:text-5xl">New objects, useful updates.</h2>
 
-                  <p className="mt-4 text-white/50 text-lg max-w-lg mx-auto">
-                    Subscribe for exclusive drops, AR experiences, and early
-                    access to next-gen products.
+                  <p className="mt-4 max-w-lg text-lg leading-8 text-muted">
+                    Get occasional notes about new products, spatial tools, and practical buying guides.
                   </p>
 
                   <div className="mt-10 max-w-md mx-auto">
@@ -103,17 +95,13 @@ export function NewsletterSection() {
                     )}
                   </div>
 
-                  <div className="mt-6 flex items-center justify-center gap-2 text-sm text-white/30">
+                  <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>No spam. Unsubscribe anytime.</span>
                   </div>
                 </motion.div>
               </div>
-
-              <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-primary/5 blur-3xl" />
-              <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-accent/5 blur-3xl" />
             </div>
-          </div>
         </ScrollReveal>
       </div>
     </section>

@@ -1,4 +1,5 @@
 'use client'
+
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -11,24 +12,26 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
     const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-dark shadow-glow hover:shadow-glow-accent',
-      secondary: 'bg-white/10 text-white hover:bg-white/20 border border-white/10',
-      ghost: 'text-white/70 hover:text-white hover:bg-white/10',
-      outline: 'border border-primary/50 text-primary hover:bg-primary/10',
-      glass: 'glass glass-hover text-white',
+      primary: 'bg-electric text-ink hover:bg-primary-light shadow-glow',
+      secondary: 'bg-panel-soft text-paper border border-line hover:border-border-hover hover:bg-panel',
+      ghost: 'text-muted hover:text-paper hover:bg-panel-soft',
+      outline: 'border border-electric/60 text-electric hover:bg-electric/10',
+      glass: 'glass glass-hover text-paper',
     }
     const sizes = {
-      sm: 'px-4 py-2 text-sm',
-      md: 'px-6 py-3 text-sm',
-      lg: 'px-8 py-4 text-base',
-      xl: 'px-10 py-5 text-lg',
+      sm: 'min-h-9 px-3 text-sm',
+      md: 'min-h-11 px-5 text-sm',
+      lg: 'min-h-12 px-7 text-base',
+      xl: 'min-h-14 px-8 text-base',
     }
+
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
+        aria-busy={isLoading || undefined}
         className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center gap-2 rounded-control font-medium transition-[background-color,border-color,color,box-shadow,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric focus-visible:ring-offset-2 focus-visible:ring-offset-ink active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45',
           variants[variant],
           sizes[size],
           className
@@ -36,7 +39,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading && (
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -46,5 +49,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     )
   }
 )
+
 Button.displayName = 'Button'
+
 export { Button }

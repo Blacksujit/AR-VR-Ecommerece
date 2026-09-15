@@ -8,7 +8,7 @@ interface Benefit {
   icon: LucideIcon
   title: string
   description: string
-  gradient: string
+
 }
 
 const benefits: Benefit[] = [
@@ -17,35 +17,36 @@ const benefits: Benefit[] = [
     title: 'AR/VR Shopping',
     description:
       'Try before you buy with immersive augmented reality. Place products in your real environment or explore them in full VR showrooms.',
-    gradient: 'from-blue-600/20 to-cyan-600/10',
+
   },
   {
     icon: Sparkles,
     title: 'AI Recommendations',
     description:
       'Our intelligent engine learns your preferences and style, delivering hyper-personalized product suggestions that get better every time.',
-    gradient: 'from-purple-600/20 to-pink-600/10',
+
   },
   {
     icon: Shield,
     title: 'Premium Quality',
     description:
       'Every product is verified, tested, and backed by our premium quality guarantee. Shop with confidence and complete purchase protection.',
-    gradient: 'from-emerald-600/20 to-teal-600/10',
+
   },
 ]
 
 export function WhyNeoVerse() {
   return (
-    <section className="relative py-24 sm:py-32">
+    <section className="relative border-b border-line py-20 sm:py-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold">
-              Why <span className="gradient-text">NeoVerse</span>
+            <p className="mb-3 text-sm font-medium text-electric">The difference is practical</p>
+            <h2 className="text-3xl font-display font-semibold tracking-tight text-paper sm:text-4xl lg:text-5xl">
+              Confidence, built into the product page
             </h2>
-            <p className="mt-4 text-white/50 text-lg max-w-xl mx-auto">
-              Redefining online shopping with cutting-edge technology
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
+              Immersive tools should answer real buying questions, not compete for attention.
             </p>
           </div>
         </ScrollReveal>
@@ -56,26 +57,24 @@ export function WhyNeoVerse() {
             return (
               <ScrollReveal key={benefit.title} delay={index * 0.15} direction="up">
                 <Card
-                  variant="glass"
-                  className="group relative overflow-hidden p-8 lg:p-10 h-full transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_0_50px_rgba(91,127,255,0.1)]"
+                  variant="default"
+                  className="group relative h-full overflow-hidden p-7 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-electric/40 hover:shadow-soft lg:p-8"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
                   <div className="relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:bg-white/10 transition-colors duration-300 group-hover:shadow-[0_0_30px_rgba(91,127,255,0.2)]">
-                      <Icon className="w-8 h-8 text-primary-light" />
+                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft transition-colors duration-200 group-hover:bg-electric/10">
+                      <Icon className="h-6 w-6 text-electric" />
                     </div>
 
-                    <h3 className="text-xl font-display font-semibold text-white mb-4">
+                    <h3 className="mb-4 font-display text-xl font-semibold text-paper">
                       {benefit.title}
                     </h3>
 
-                    <p className="text-white/50 leading-relaxed">
+                    <p className="leading-relaxed text-muted">
                       {benefit.description}
                     </p>
                   </div>
 
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                 </Card>
               </ScrollReveal>
             )

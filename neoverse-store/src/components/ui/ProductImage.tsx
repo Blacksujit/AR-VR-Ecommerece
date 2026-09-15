@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface ProductImageProps {
-  src: string
+  src?: string
   alt: string
   width?: number
   height?: number
@@ -24,7 +24,7 @@ export function ProductImage({
   fill,
   className,
   priority = false,
-  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  sizes,
   aspectRatio,
 }: ProductImageProps) {
   const [error, setError] = useState(false)
@@ -34,42 +34,55 @@ export function ProductImage({
     return (
       <div
         className={cn(
-          'w-full h-full flex items-center justify-center bg-white/5',
+          'flex items-center justify-center bg-white/5 text-white/30',
+          fill ? 'absolute inset-0' : '',
           className
         )}
         style={aspectRatio ? { aspectRatio } : undefined}
+        aria-label={alt}
       >
-        <span className="text-4xl font-display font-bold text-white/20">
-          {alt.charAt(0).toUpperCase() || '?'}
+        <span className="text-2xl font-bold select-none">
+          {alt?.charAt(0)?.toUpperCase() || '?'}
         </span>
       </div>
     )
   }
 
-  return (
-    <div
-      className={cn('relative overflow-hidden', className)}
-      style={aspectRatio ? { aspectRatio } : undefined}
-    >
-      {!loaded && (
-        <div className="absolute inset-0 bg-white/5 animate-pulse" />
-      )}
-      <Image
-        src={src}
-        alt={alt}
-        width={fill ? undefined : (width || 400)}
-        height={fill ? undefined : (height || 400)}
-        fill={fill}
-        className={cn(
-          'object-cover transition-opacity duration-300',
-          loaded ? 'opacity-100' : 'opacity-0'
+  const imgProps = {
+    src,
+    alt,
+    className: cn(
+      'object-cover transition-opacity duration-300',
+      loaded ? 'opacity-100' : 'opacity-0',
+      className
+    ),
+    onLoadingComplete: () => setLoaded(true),
+    onError: () => setError(true),
+    priority,
+    sizes: sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+    unoptimized: process.env.NODE_ENV === 'development',
+  }
+
+  if (fill) {
+    return (
+      <>
+        {!loaded && (
+          <div className="absolute inset-0 animate-pulse bg-white/5" />
         )}
-        onLoad={() => setLoaded(true)}
-        onError={() => setError(true)}
-        priority={priority}
-        sizes={sizes}
-        unoptimized={process.env.NODE_ENV === 'development'}
-      />
-    </div>
+        <Image {...imgProps} fill />
+      </>
+    )
+  }
+
+  return (
+    <>
+      {!loaded && (
+        <div
+          className="animate-pulse bg-white/5"
+          style={{ width, height, aspectRatio }}
+        />
+      )}
+      <Image {...imgProps} width={width} height={height} />
+    </>
   )
 }

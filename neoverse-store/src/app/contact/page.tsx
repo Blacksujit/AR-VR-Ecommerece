@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import StoreMap from '@/components/ui/StoreMap'
-import AIChatBot from '@/components/ai/AIChatBot'
 import { Mail, Phone, MapPin, Clock, Send, ChevronDown, MessageSquare, HeadphonesIcon } from 'lucide-react'
 
 const contactInfo = [
@@ -55,17 +54,13 @@ export default function ContactPage() {
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm mb-6">
-              <HeadphonesIcon className="w-4 h-4" />
-              Get in Touch
+          <div className="mb-16 max-w-2xl">
+            <div className="mb-5 flex items-center gap-2 text-sm text-muted">
+              <HeadphonesIcon className="h-4 w-4 text-electric" />
+              Help with an order or product
             </div>
-            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4">
-              Let&apos;s <span className="gradient-text">Connect</span>
-            </h1>
-            <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              Have a question, feedback, or just want to say hi? We&apos;d love to hear from you.
-            </p>
+            <h1 className="text-4xl font-display font-medium tracking-tight md:text-6xl">Talk to a real person.</h1>
+            <p className="mt-5 text-lg leading-8 text-muted">Ask about an order, a product detail, or using AR before you buy. We&apos;ll point you to the next useful step.</p>
           </div>
         </ScrollReveal>
 
@@ -73,8 +68,8 @@ export default function ContactPage() {
           {contactInfo.map(({ icon: Icon, label, value, desc }, i) => (
             <ScrollReveal key={label} delay={i * 0.1}>
               <Card className="p-6 text-center hover:border-primary/30 transition-all duration-500 group">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Icon className="w-6 h-6 text-primary" />
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-control border border-line bg-panel-soft">
+                  <Icon className="h-6 w-6 text-electric" />
                 </div>
                 <h3 className="font-semibold mb-1">{label}</h3>
                 <p className="text-white/90 font-medium">{value}</p>
@@ -231,7 +226,6 @@ export default function ContactPage() {
         </ScrollReveal>
       </div>
 
-      <AIChatBot />
     </div>
   )
 }

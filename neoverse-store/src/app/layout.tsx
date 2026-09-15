@@ -18,9 +18,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "NeoVerse Store - The Future of Shopping",
+  title: "NeoVerse Store — See it before it arrives",
   description:
-    "Experience the next generation of online shopping with AR/VR technology. Browse products in immersive 3D environments.",
+    "Inspect furniture, home objects, and design-led technology in 3D or AR before you buy.",
 };
 
 export default function RootLayout({
@@ -34,7 +34,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={cn(inter.variable, spaceGrotesk.variable, "h-full antialiased")}
     >
-      <body className="min-h-full flex flex-col grid-bg noise-bg">
+      <body className="min-h-full flex flex-col">
         <Providers>
           <Navbar />
           <main className="flex-1 pt-16">{children}</main>

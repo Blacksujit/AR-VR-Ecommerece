@@ -14,20 +14,60 @@ import { CreditCard, Truck, Shield, Lock, ChevronRight, MapPin, Package, Chevron
 
 const steps = ['Shipping', 'Review']
 
+interface ShippingData {
+  fullName: string; email: string; phone: string
+  street: string; city: string; state: string; zip: string; country: string
+}
+
+interface FieldErrors {
+  [key: string]: string
+}
+
+function validateShipping(data: ShippingData): FieldErrors {
+  const errors: FieldErrors = {}
+  if (!data.fullName || data.fullName.trim().length < 2) errors.fullName = 'Full name is required'
+  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = 'Valid email is required'
+  if (!data.phone || data.phone.trim().length < 7) errors.phone = 'Phone number is required'
+  if (!data.street || data.street.trim().length < 3) errors.street = 'Street address is required'
+  if (!data.city || data.city.trim().length < 2) errors.city = 'City is required'
+  if (!data.state || data.state.trim().length < 2) errors.state = 'State is required'
+  if (!data.zip || data.zip.trim().length < 3) errors.zip = 'ZIP code is required'
+  if (!data.country || data.country.trim().length < 2) errors.country = 'Country is required'
+  return errors
+}
+
 export default function CheckoutPage() {
   const { items, getSubtotal } = useCartStore()
   const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [isPlacing, setIsPlacing] = useState(false)
-  const [shipping, setShipping] = useState({
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [shipping, setShipping] = useState<ShippingData>({
     fullName: '', email: '', phone: '', street: '', city: '', state: '', zip: '', country: 'United States',
   })
+
+  const updateField = (key: string, value: string) => {
+    setShipping(p => ({ ...p, [key]: value }))
+    if (fieldErrors[key]) {
+      setFieldErrors(p => { const n = { ...p }; delete n[key]; return n })
+    }
+  }
 
   const subtotal = getSubtotal()
   const shippingCost = subtotal >= 100 ? 0 : 9.99
   const taxRate = 0.08
   const tax = Math.round(subtotal * taxRate * 100) / 100
   const total = Math.round((subtotal + shippingCost + tax) * 100) / 100
+
+  const handleContinue = () => {
+    const errors = validateShipping(shipping)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      toast.error('Please fix the highlighted fields')
+      return
+    }
+    setStep(s => s + 1)
+  }
 
   const handlePlaceOrder = async () => {
     if (!user) {
@@ -79,7 +119,7 @@ export default function CheckoutPage() {
     )
   }
 
-  const shippingFields: { label: string; key: string; type?: string; placeholder: string; colSpan?: number }[] = [
+  const shippingFields: { label: string; key: keyof ShippingData; type?: string; placeholder: string; colSpan?: number }[] = [
     { label: 'Full Name', key: 'fullName', placeholder: 'John Doe', colSpan: 2 },
     { label: 'Email Address', key: 'email', type: 'email', placeholder: 'john@example.com', colSpan: 2 },
     { label: 'Phone Number', key: 'phone', placeholder: '+1 (555) 000-0000', colSpan: 2 },
@@ -131,8 +171,9 @@ export default function CheckoutPage() {
                           label={label}
                           type={type || 'text'}
                           placeholder={placeholder}
-                          value={shipping[key as keyof typeof shipping]}
-                          onChange={e => setShipping(p => ({ ...p, [key]: e.target.value }))}
+                          value={shipping[key]}
+                          onChange={e => updateField(key, e.target.value)}
+                          error={fieldErrors[key]}
                           required
                         />
                       </div>
@@ -193,7 +234,7 @@ export default function CheckoutPage() {
                 </Button>
               )}
               {step < 1 && (
-                <Button className="flex-1" onClick={() => setStep(s => s + 1)}>
+                <Button className="flex-1" onClick={handleContinue}>
                   Continue
                   <ChevronRight className="w-4 h-4" />
                 </Button>

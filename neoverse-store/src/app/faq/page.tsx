@@ -23,15 +23,13 @@ export default function FAQPage() {
     <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm mb-6">
-              <HelpCircle className="w-4 h-4" />
-              FAQ
+          <div className="mb-12 max-w-2xl">
+            <div className="mb-5 flex items-center gap-2 text-sm text-muted">
+              <HelpCircle className="h-4 w-4 text-electric" />
+              Product and order help
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-              Frequently Asked <span className="gradient-text">Questions</span>
-            </h1>
-            <p className="text-white/60">Everything you need to know about shopping on NeoVerse</p>
+            <h1 className="text-4xl font-display font-medium tracking-tight md:text-5xl">Questions before you buy</h1>
+            <p className="mt-4 text-base leading-7 text-muted">Clear answers about delivery, returns, AR, the showroom, and your account.</p>
           </div>
         </ScrollReveal>
 

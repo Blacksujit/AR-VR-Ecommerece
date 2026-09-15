@@ -122,15 +122,15 @@ function MobileSidebarContent({
 }) {
   return (
     <div className="h-full p-4 flex flex-col gap-1">
-      <div className="flex items-center justify-between pb-4 mb-2 border-b border-white/10">
-        <span className="font-display font-bold text-lg gradient-text">NeoVerse</span>
-        <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/10 transition-colors" aria-label="Close menu">
-          <X className="w-5 h-5" />
+      <div className="mb-2 flex items-center justify-between border-b border-line pb-4">
+        <span className="font-display text-lg font-medium tracking-tight text-paper">NeoVerse</span>
+        <button onClick={onClose} className="rounded-control p-2 text-muted transition-colors hover:bg-panel-soft hover:text-paper" aria-label="Close menu">
+          <X className="h-5 w-5" />
         </button>
       </div>
 
       <div className="flex items-center gap-3 pb-4 mb-2 border-b border-white/10">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control border border-line bg-panel-soft">
           <span className="text-sm font-bold text-white">{user?.name?.charAt(0) || '?'}</span>
         </div>
         <div className="min-w-0">

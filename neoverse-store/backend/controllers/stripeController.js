@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { AppError } = require('../middleware/errorHandler');
+const { getOrderQuote } = require('./orderController');
 
 let stripeInstance = null;
 
@@ -24,29 +25,39 @@ const createCheckoutSession = async (req, res, next) => {
       return next(new AppError('No items in cart', 400));
     }
 
-    const lineItems = [];
-    let itemsPrice = 0;
-
+    const requestedItems = new Map();
     for (const item of items) {
-      console.log(`[Stripe] Looking up product: ${item.product}`);
-      const product = await Product.findById(item.product);
-      if (!product) {
-        console.log(`[Stripe] Product not found: ${item.product}`);
-        return next(new AppError(`Product not found: ${item.product}`, 404));
+      const productId = String(item.product || '');
+      const quantity = Number(item.quantity);
+      if (!productId || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+        return next(new AppError('Each order item requires a valid product and quantity', 400));
       }
-      console.log(`[Stripe] Product found: ${product.name}, price=${product.price}, stock=${product.stock}`);
-      if (product.stock < item.quantity) {
-        return next(
-          new AppError(`Insufficient stock for ${product.name}`, 400)
-        );
-      }
+      requestedItems.set(productId, (requestedItems.get(productId) || 0) + quantity);
+    }
 
-      const unitPrice = product.discount > 0
-        ? Math.round(product.price * (1 - product.discount / 100) * 100)
-        : Math.round(product.price * 100);
+    const products = await Product.find({ _id: { $in: [...requestedItems.keys()] } });
+    const productById = new Map(products.map((product) => [product._id.toString(), product]));
+    const quote = { subtotal: 0, shipping: 0, tax: 0, total: 0, items: [] };
 
+    for (const [productId, quantity] of requestedItems) {
+      const product = productById.get(productId);
+      if (!product) return next(new AppError(`Product not found: ${productId}`, 404));
+      if (product.stock < quantity) return next(new AppError(`Insufficient stock for ${product.name}`, 409));
+
+      const unitPrice = Number((product.price - (product.price * product.discount) / 100).toFixed(2));
+      const lineTotal = Number((unitPrice * quantity).toFixed(2));
+      quote.subtotal += lineTotal;
+      quote.items.push({ product, quantity, unitPrice, lineTotal });
+    }
+
+    quote.subtotal = Number(quote.subtotal.toFixed(2));
+    quote.shipping = quote.subtotal >= 100 ? 0 : 9.99;
+    quote.tax = Number((quote.subtotal * 0.08).toFixed(2));
+    quote.total = Number((quote.subtotal + quote.shipping + quote.tax).toFixed(2));
+
+    const lineItems = quote.items.map(({ product, quantity, unitPrice }) => {
       const validImages = (product.images || []).filter(img => typeof img === 'string' && (img.startsWith('http://') || img.startsWith('https://')));
-      lineItems.push({
+      return {
         price_data: {
           currency: 'usd',
           product_data: {
@@ -54,18 +65,15 @@ const createCheckoutSession = async (req, res, next) => {
             images: validImages.length > 0 ? [validImages[0]] : undefined,
             description: product.description?.substring(0, 200),
           },
-          unit_amount: unitPrice,
+          unit_amount: Math.round(unitPrice * 100),
         },
-        quantity: item.quantity,
-      });
+        quantity,
+      };
+    });
 
-      itemsPrice += (unitPrice / 100) * item.quantity;
-    }
-
-    const shippingPrice = itemsPrice >= 100 ? 0 : 9.99;
-    const taxRate = 0.08;
-    const taxPrice = Math.round(itemsPrice * taxRate * 100) / 100;
-    const totalPrice = Math.round((itemsPrice + shippingPrice + taxPrice) * 100) / 100;
+    const itemsPrice = quote.subtotal;
+    const shippingPrice = quote.shipping;
+    const taxPrice = quote.tax;
 
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
@@ -94,6 +102,7 @@ const createCheckoutSession = async (req, res, next) => {
         itemsPrice: itemsPrice.toString(),
         shippingPrice: shippingPrice.toString(),
         taxPrice: taxPrice.toString(),
+        quoteTotal: quote.total.toString(),
       },
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/checkout?canceled=true`,
@@ -187,6 +196,11 @@ const handleWebhook = async (req, res) => {
         return res.status(404).json({ success: false, message: 'User not found' });
       }
 
+      const existingOrder = await Order.findOne({ stripeSessionId: session.id });
+      if (existingOrder) {
+        return res.json({ received: true, duplicate: true });
+      }
+
       const order = await Order.create({
         user: userId,
         items,
@@ -202,13 +216,6 @@ const handleWebhook = async (req, res) => {
         stripeSessionId: session.id,
       });
 
-      for (const item of items) {
-        if (item.product) {
-          await Product.findByIdAndUpdate(item.product, {
-            $inc: { stock: -item.quantity },
-          });
-        }
-      }
 
       console.log(`Order created: ${order._id} for user ${userId}`);
     } catch (error) {
