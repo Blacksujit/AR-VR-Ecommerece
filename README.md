@@ -1,225 +1,319 @@
-# NeoVerse Store — AR/VR Powered AI E-Commerce Platform
+# NeoVerse Store
 
-> "The Future of Shopping Begins Here."
+NeoVerse Store is an immersive commerce application focused on helping customers make better purchase decisions through product inspection, spatial visualization, and catalog-grounded assistance.
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Three.js](https://img.shields.io/badge/Three.js-R3F-green)](https://docs.pmnd.rs/react-three-fiber)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248)](https://www.mongodb.com/atlas)
+The repository currently contains a Next.js storefront and a separate Express API. The web application is deployed on Vercel. The API is configured for deployment on Render and uses MongoDB for server-side commerce data.
 
-NeoVerse Store is a production-grade AR/VR-powered e-commerce platform built with Next.js 16, featuring immersive 3D product visualization, AR try-on experiences, a virtual reality showroom, and AI-powered shopping assistance.
+> The project is an active build. The storefront is live, but the catalog and checkout systems still need to be unified before unrestricted production commerce is enabled.
 
----
+## Repository structure
 
-## Features
-
-### 🛍️ Immersive Shopping
-- **3D Product Viewer** — Interactive 360° product visualization using React Three Fiber
-- **AR Try-On** — View products in your space using WebXR (`immersive-ar`)
-- **VR Showroom** — Explore products in a virtual 3D showroom with floating displays
-
-### 🤖 AI-Powered
-- AI Shopping Assistant for product recommendations and comparisons
-- Smart search with voice search UI
-- Personalized recommendations based on browsing history
-
-### 🎨 Premium Design
-- Dark theme with glassmorphism aesthetic
-- Smooth scroll-triggered animations (Framer Motion + GSAP)
-- Particle effects, parallax, and micro-interactions
-- Fully responsive across all devices
-
-### 🔧 Full E-Commerce
-- Product catalog with filters, sorting, and search
-- Shopping cart with persistent storage (Zustand)
-- Wishlist management
-- User authentication (mock auth with Google/GitHub login)
-- Admin dashboard with analytics (Recharts)
-- Order management system
-
----
-
-## Tech Stack
-
-| Category | Technologies |
-|----------|-------------|
-| **Frontend** | Next.js 16, React 19, TypeScript, Tailwind CSS v4 |
-| **3D & AR/VR** | Three.js, React Three Fiber, Drei, WebXR |
-| **Animations** | Framer Motion, GSAP, Lenis |
-| **State** | Zustand (persisted), TanStack Query |
-| **Backend** | Node.js, Express, MongoDB (Mongoose) |
-| **Auth** | Firebase (mock with Google/GitHub) |
-| **UI** | Lucide Icons, Recharts |
-| **Deployment** | Vercel (frontend), Render (backend) |
-
----
-
-## Project Structure
-
-```
-neoverse-store/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── page.tsx            # Landing page
-│   │   ├── products/           # Product listing & detail
-│   │   ├── categories/         # Category browsing
-│   │   ├── vr-showroom/        # VR showroom
-│   │   ├── dashboard/          # User dashboard
-│   │   ├── admin/              # Admin panel
-│   │   ├── checkout/           # Checkout flow
-│   │   └── contact/            # Contact & FAQ
-│   ├── components/
-│   │   ├── ui/                 # Reusable UI primitives
-│   │   ├── layout/             # Navbar, Footer, Providers
-│   │   ├── landing/            # Landing page sections
-│   │   ├── product/            # Product viewer & cards
-│   │   ├── ar-vr/              # AR & VR components
-│   │   ├── auth/               # Auth context & modals
-│   │   └── cart/               # Cart sidebar
-│   ├── store/                  # Zustand stores
-│   ├── hooks/                  # Custom React hooks
-│   ├── lib/                    # Utilities, constants, API client
-│   └── types/                  # TypeScript type definitions
-├── backend/                    # Express + MongoDB API
-│   ├── server.js               # Entry point
-│   ├── models/                 # Mongoose schemas
-│   ├── controllers/            # Route handlers
-│   ├── routes/                 # Express routes
-│   └── middleware/             # Auth & error handling
-└── public/                     # Static assets
+```text
+AR-VR-Assignment/
+├── README.md
+└── neoverse-store/
+    ├── src/                  # Next.js storefront
+    ├── backend/              # Express and MongoDB API
+    ├── public/               # Static assets
+    ├── docs/                 # Product and architecture documentation
+    ├── DESIGN.md             # Visual and interaction design rules
+    ├── ARCHITECTURE.md       # System architecture
+    ├── package.json          # Web app scripts and dependencies
+    └── vercel.json           # Vercel configuration
 ```
 
----
+## Applications
 
-## Getting Started
+### Web application
 
-### Prerequisites
+The web application is located in [`neoverse-store/`](./neoverse-store/).
 
-- Node.js 20.9+
-- MongoDB (local or Atlas)
-- npm
+It provides:
 
-### Installation
+- Product browsing, search, filtering, sorting, and category pages.
+- Product detail and inspection surfaces.
+- Persistent cart and wishlist state.
+- Checkout and server quote integration.
+- Account and dashboard pages.
+- 3D, AR, and VR-related experiences where supported by the device and product data.
+- Catalog-grounded shopping assistance through the API.
+
+Production URL:
+
+- [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+
+### API
+
+The Express API is located in [`neoverse-store/backend/`](./neoverse-store/backend/).
+
+It provides the server boundary for:
+
+- MongoDB-backed products and categories.
+- Server-side pricing, discounts, shipping, tax, and stock checks.
+- Orders and checkout quotes.
+- Stripe Checkout and webhook handling.
+- Firebase Admin authentication.
+- Cart, wishlist, reviews, recommendations, uploads, contact, and email operations.
+- Claude-based shopping assistance with existing provider fallbacks.
+
+The API has a public liveness route:
+
+```text
+GET /api/health
+```
+
+The deployed API URL is environment-specific and is intentionally not hard-coded here. Configure it in the web app as `NEXT_PUBLIC_API_URL`.
+
+## Current production boundary
+
+The public web catalog currently uses the DummyJSON provider through the Next.js application. The Express commerce API uses MongoDB product records.
+
+These sources currently expose different product identifiers. For example, the web catalog can return IDs such as `dummyjson-1`, while the order system expects MongoDB product records. This must be resolved before production checkout is treated as fully reliable.
+
+The intended direction is:
+
+1. MongoDB becomes the production catalog source of truth.
+2. Product prices, inventory, capabilities, and identifiers are shared by browsing, quote, order, and Stripe flows.
+3. DummyJSON remains an explicit development or synchronization source rather than an independent checkout catalog.
+
+## Architecture flow
+
+The system is deployed as two applications. The browser loads the Next.js storefront from Vercel, then calls the Express API for account, commerce, payment, and AI operations. External services remain behind the API wherever credentials or server-side validation are required.
+
+```mermaid
+flowchart TD
+    customer[Customer browser]
+
+    subgraph vercel[Vercel]
+        web[Next.js storefront\nApp Router and route handlers]
+        webState[Zustand cart and wishlist state]
+        webCatalog[Product provider layer\nCurrent public fallback: DummyJSON]
+    end
+
+    subgraph render[Render or another Node host]
+        api[Express API]
+        middleware[Security, CORS, rate limits, auth middleware]
+        routes[Commerce and domain routes]
+        services[Business services\npricing, inventory, AI, media, email]
+    end
+
+    mongo[(MongoDB\nproducts, users, carts, orders, reviews)]
+    firebase[Firebase Auth\nand Firebase Admin]
+    stripe[Stripe Checkout\nand webhooks]
+    anthropic[Anthropic Claude\nshopping assistant]
+    fallbacks[OpenAI or Gemini\nconfigured fallback providers]
+    cloudinary[Cloudinary\nproduct and upload media]
+    resend[Resend\ntransactional email]
+    dummyjson[(DummyJSON\ndevelopment or sync source)]
+
+    customer --> web
+    web --> webState
+    web -->|public catalog requests| webCatalog
+    web -->|API requests\nNEXT_PUBLIC_API_URL| api
+
+    api --> middleware
+    middleware --> routes
+    routes --> services
+    services --> mongo
+    middleware -->|token verification| firebase
+    services -->|create checkout session| stripe
+    stripe -->|signed webhook| api
+    services -->|catalog-grounded requests| anthropic
+    services -->|fallback when configured| fallbacks
+    services --> cloudinary
+    services --> resend
+    webCatalog -.->|current public fallback| dummyjson
+
+    quote[Server quote and checkout] --> api
+    quote -.->|must use same catalog IDs and prices| mongo
+```
+
+### Request boundaries
+
+- **Browser to Next.js:** page rendering, public catalog routes, cart and wishlist UI state, and immersive experiences.
+- **Browser to Express:** authenticated account requests, cart synchronization, server quotes, orders, checkout sessions, and AI requests.
+- **Express to MongoDB:** authoritative pricing, stock, order, account, and review data.
+- **Express to Stripe:** payment-session creation and signed webhook processing. Stripe events must not be trusted without signature verification.
+- **Express to AI providers:** catalog context and bounded conversation history. Provider credentials never belong in browser-exposed environment variables.
+- **Catalog synchronization:** DummyJSON may supply development data, but it must not remain a second independent source of truth for production checkout.
+
+## Quick start
+
+### Requirements
+
+- Node.js 20.9 or newer.
+- npm.
+- MongoDB for the API.
+- Firebase credentials for authenticated flows.
+- Stripe credentials for payment testing.
+- Provider credentials for any optional integrations you enable.
+
+### Install dependencies
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/neoverse-store.git
 cd neoverse-store
-
-# Install frontend dependencies
 npm install
 
-# Install backend dependencies
-cd backend && npm install
-
-# Configure environment
-cp .env.example .env.local
+cd backend
+npm install
 ```
 
-### Environment Variables
+### Configure the web app
 
-Create `.env.local` in the root:
+Create `neoverse-store/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
 ```
 
-Create `backend/.env`:
+### Configure the API
+
+Create `neoverse-store/backend/.env`:
 
 ```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/neoverse
-JWT_SECRET=your_jwt_secret_key
 NODE_ENV=development
+PORT=5000
+FRONTEND_URL=http://localhost:3000
+MONGODB_URI=mongodb://127.0.0.1:27017/neoverse
+
+FIREBASE_SERVICE_ACCOUNT_KEY=
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+ANTHROPIC_API_KEY=
+ANTHROPIC_AUTH_TOKEN=
+ANTHROPIC_MODEL=claude-opus-5
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
 ```
 
-### Run Development
+Keep all secrets server-side. Do not commit `.env` files, Firebase service-account credentials, payment keys, webhook secrets, or AI provider keys.
+
+### Run locally
+
+Start the API in one terminal:
 
 ```bash
-# Start backend (from backend/)
+cd neoverse-store/backend
 npm run dev
-
-# Start frontend (from root)
-npm run dev
-
-# Seed database with sample data
-cd backend && node seeder.js
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Start the web app in another:
 
-### Demo Accounts
+```bash
+cd neoverse-store
+npm run dev
+```
 
-| Email | Password | Role |
-|-------|----------|------|
-| `demo@neoverse.com` | any password | User |
-| `admin@neoverse.com` | any password | Admin |
+Open:
 
----
+- Web app: [http://localhost:3000](http://localhost:3000)
+- API health: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+
+If MongoDB is empty, the API can synchronize products and categories from its external product service. The seed utility can also be run explicitly:
+
+```bash
+cd neoverse-store/backend
+node seeder.js
+```
+
+Review the synchronization behavior before using it against a production database.
+
+## Useful commands
+
+Run from `neoverse-store/`:
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npx tsc --noEmit
+```
+
+Run from `neoverse-store/backend/`:
+
+```bash
+npm run dev
+npm start
+```
 
 ## Deployment
 
-### Frontend (Vercel)
+### Vercel
+
+The web app is configured through [`neoverse-store/vercel.json`](./neoverse-store/vercel.json).
 
 ```bash
+cd neoverse-store
 npm run build
-vercel --prod
+npx vercel deploy --prod --yes
 ```
 
-### Backend (Render)
+Set `NEXT_PUBLIC_API_URL` in the Vercel production environment to the deployed API base URL, including `/api`.
 
-1. Create a new Web Service on Render
-2. Set root directory to `backend/`
-3. Set build command: `npm install`
-4. Set start command: `npm start`
-5. Add environment variables from `backend/.env`
-6. Set up MongoDB Atlas for production database
+Verify after deployment:
 
----
+```bash
+curl -I https://neoverse-store.vercel.app
+curl https://neoverse-store.vercel.app/api/categories
+curl "https://neoverse-store.vercel.app/api/products?limit=1"
+```
 
-## API Endpoints
+### Render
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/users` | Register user | No |
-| POST | `/api/users/login` | Login | No |
-| GET | `/api/users/profile` | Get profile | JWT |
-| GET | `/api/products` | List products | No |
-| GET | `/api/products/featured` | Featured products | No |
-| GET | `/api/products/top` | Top rated | No |
-| GET | `/api/products/:slug` | Product detail | No |
-| POST | `/api/products` | Create product | Admin |
-| PUT | `/api/products/:id` | Update product | Admin |
-| DELETE | `/api/products/:id` | Delete product | Admin |
-| POST | `/api/orders` | Create order | JWT |
-| GET | `/api/orders/myorders` | My orders | JWT |
-| GET | `/api/orders/:id` | Order detail | JWT |
-| PUT | `/api/orders/:id/pay` | Pay order | JWT |
-| PUT | `/api/orders/:id/deliver` | Deliver order | Admin |
+The API deployment is described in [`neoverse-store/backend/render.yaml`](./neoverse-store/backend/render.yaml).
 
----
+The service uses:
 
-## Architecture
+- Root directory: `backend`
+- Build command: `npm install`
+- Start command: `npm start`
 
-### Design Decisions
+After configuring the required environment variables, verify the service before connecting it to Vercel:
 
-- **Feature-based architecture** for scalable code organization
-- **Zustand** over Redux for lightweight state management with persistence
-- **React Three Fiber** for declarative 3D rendering
-- **WebXR API** for AR capabilities (no external SDKs)
-- **Mock auth** to demonstrate the flow without Firebase configuration
-- **Turbopack** as default bundler for faster dev builds
+```bash
+curl https://<api-host>/api/health
+```
 
-### Key Patterns
+## Documentation map
 
-- Server Components for SEO-critical pages, Client Components for interactive features
-- Dynamic imports with `lazy()` for Three.js components (reduces bundle size)
-- `Suspense` boundaries around 3D content
-- Zustand persist middleware for cart/wishlist across sessions
-- Debounced search with 300ms delay
+Start with these documents before making significant changes:
 
----
+- [`neoverse-store/README.md`](./neoverse-store/README.md) — detailed application setup, API reference, deployment, and operational notes.
+- [`neoverse-store/DESIGN.md`](./neoverse-store/DESIGN.md) — visual language, interaction rules, accessibility, and design review criteria.
+- [`neoverse-store/ARCHITECTURE.md`](./neoverse-store/ARCHITECTURE.md) — architecture and system boundaries.
+- [`neoverse-store/docs/PRD.md`](./neoverse-store/docs/PRD.md) — product requirements and intended customer value.
+- [`neoverse-store/docs/ARCHITECTURE_REVIEW.md`](./neoverse-store/docs/ARCHITECTURE_REVIEW.md) — known architectural risks and recommendations.
+- [`neoverse-store/docs/FRONTEND_CONTEXT_GOVERNANCE.md`](./neoverse-store/docs/FRONTEND_CONTEXT_GOVERNANCE.md) — frontend change and context governance.
+- [`neoverse-store/docs/FRONTEND_DESIGN_PLAN.md`](./neoverse-store/docs/FRONTEND_DESIGN_PLAN.md) — frontend implementation plan.
+
+## Engineering priorities
+
+The highest-value production work is:
+
+1. Unify the web and API catalog sources and product IDs.
+2. Verify the Render API deployment and configure its URL in Vercel.
+3. Add idempotency and integration tests around order creation and Stripe webhooks.
+4. Enforce a fail-closed production CORS policy.
+5. Remove and rotate any credential files that have entered the repository.
+6. Add automated coverage for pricing, inventory reservation, authentication, and checkout failure paths.
 
 ## License
 
-MIT
+No license file is currently included. Add an explicit license before distributing the repository outside its owning organization.
