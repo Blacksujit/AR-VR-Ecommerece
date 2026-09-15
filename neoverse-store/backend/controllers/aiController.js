@@ -1,7 +1,9 @@
 const Product = require('../models/Product');
 const { AppError } = require('../middleware/errorHandler');
+const { answerShoppingQuestion, getClient: getClaudeClient } = require('../services/claudeShoppingService');
 
 const getAvailableModel = () => {
+  if (getClaudeClient()) return 'claude';
   const openaiKey = process.env.OPENAI_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
   if (openaiKey) return 'openai';
@@ -109,7 +111,7 @@ const chat = async (req, res, next) => {
       return res.json({
         success: true,
         data: {
-          response: 'AI shopping assistant is not configured. Please set OPENAI_API_KEY or GEMINI_API_KEY in the backend environment variables.',
+          response: 'Shopping guidance is not configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to the backend environment.',
           products: [],
         },
       });
@@ -146,7 +148,16 @@ RULES:
     }));
 
     let response;
-    if (model === 'openai') {
+    let recommendationIds = [];
+    let usage;
+    let providerModel;
+    if (model === 'claude') {
+      const result = await answerShoppingQuestion({ message, history: chatHistory, products });
+      response = result.response;
+      recommendationIds = result.recommendationIds;
+      usage = result.usage;
+      providerModel = result.model;
+    } else if (model === 'openai') {
       response = await queryOpenAI([
         { role: 'system', content: systemPrompt },
         ...chatHistory,
@@ -173,7 +184,15 @@ RULES:
           images: p.images,
           rating: p.rating,
           category: p.category,
+          recommended: recommendationIds.includes(p._id.toString()),
         })),
+        provider: model,
+        model: providerModel,
+        usage: usage ? {
+          inputTokens: usage.input_tokens,
+          outputTokens: usage.output_tokens,
+          cacheReadInputTokens: usage.cache_read_input_tokens || 0,
+        } : undefined,
       },
     });
   } catch (error) {

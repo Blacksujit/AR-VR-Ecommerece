@@ -24,6 +24,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.2.0",
     "openai": "^6.45.0",
+    "@anthropic-ai/sdk": "^0.68.0",
     "resend": "^6.17.1",
     "stripe": "^22.3.0"
   },

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,25 @@ interface FieldErrors {
   [key: string]: string
 }
 
+interface QuoteItem {
+  productId: string
+  name: string
+  quantity: number
+  unitPrice: number
+  lineTotal: number
+}
+
+interface CheckoutQuote {
+  items: QuoteItem[]
+  currency: string
+  subtotal: number
+  shipping: number
+  tax: number
+  taxRate: number
+  total: number
+  expiresAt: string
+}
+
 function validateShipping(data: ShippingData): FieldErrors {
   const errors: FieldErrors = {}
   if (!data.fullName || data.fullName.trim().length < 2) errors.fullName = 'Full name is required'
@@ -37,10 +56,13 @@ function validateShipping(data: ShippingData): FieldErrors {
 }
 
 export default function CheckoutPage() {
-  const { items, getSubtotal } = useCartStore()
+  const { items } = useCartStore()
   const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [isPlacing, setIsPlacing] = useState(false)
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null)
+  const [isQuoting, setIsQuoting] = useState(true)
+  const [quoteError, setQuoteError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [shipping, setShipping] = useState<ShippingData>({
     fullName: '', email: '', phone: '', street: '', city: '', state: '', zip: '', country: 'United States',
@@ -53,11 +75,31 @@ export default function CheckoutPage() {
     }
   }
 
-  const subtotal = getSubtotal()
-  const shippingCost = subtotal >= 100 ? 0 : 9.99
-  const taxRate = 0.08
-  const tax = Math.round(subtotal * taxRate * 100) / 100
-  const total = Math.round((subtotal + shippingCost + tax) * 100) / 100
+  useEffect(() => {
+    let cancelled = false
+    const loadQuote = async () => {
+      setIsQuoting(true)
+      setQuoteError('')
+      try {
+        await api.freshToken()
+        const response = await api.post<{ success: boolean; data: CheckoutQuote }>('/orders/quote', {
+          items: items.map(item => ({ product: item.product._id, quantity: item.quantity })),
+        })
+        if (!cancelled) setQuote(response.data)
+      } catch (error) {
+        if (!cancelled) setQuoteError(error instanceof Error ? error.message : 'Unable to confirm the order total')
+      } finally {
+        if (!cancelled) setIsQuoting(false)
+      }
+    }
+    void loadQuote()
+    return () => { cancelled = true }
+  }, [items])
+
+  const subtotal = quote?.subtotal ?? 0
+  const shippingCost = quote?.shipping ?? 0
+  const tax = quote?.tax ?? 0
+  const total = quote?.total ?? 0
 
   const handleContinue = () => {
     const errors = validateShipping(shipping)
@@ -66,12 +108,20 @@ export default function CheckoutPage() {
       toast.error('Please fix the highlighted fields')
       return
     }
+    if (!quote || new Date(quote.expiresAt).getTime() <= Date.now()) {
+      setQuoteError('Your price confirmation expired. Refresh it before continuing.')
+      return
+    }
     setStep(s => s + 1)
   }
 
   const handlePlaceOrder = async () => {
     if (!user) {
       toast.error('Please sign in to checkout')
+      return
+    }
+    if (!quote || new Date(quote.expiresAt).getTime() <= Date.now()) {
+      setQuoteError('Your price confirmation expired. Refresh it before paying.')
       return
     }
     setIsPlacing(true)
@@ -154,6 +204,17 @@ export default function CheckoutPage() {
             </div>
           ))}
         </div>
+
+        {quoteError && (
+          <div role="alert" className="mb-6 flex items-center justify-between gap-4 rounded-surface border border-error/40 bg-error/10 px-4 py-3 text-sm text-paper">
+            <span>{quoteError}</span>
+            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>Refresh quote</Button>
+          </div>
+        )}
+
+        {isQuoting && (
+          <div className="mb-6 rounded-surface border border-line bg-panel-soft px-4 py-3 text-sm text-muted" role="status">Confirming current prices and availability…</div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
@@ -259,7 +320,7 @@ export default function CheckoutPage() {
                       <p className="text-sm font-medium truncate">{product.name}</p>
                       <p className="text-xs text-white/40">Qty: {quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold">{formatPrice(product.price * quantity)}</p>
+                    <p className="text-sm font-semibold">{formatPrice(quote?.items.find(item => item.productId === product._id)?.lineTotal ?? 0)}</p>
                   </div>
                 ))}
               </div>
@@ -286,11 +347,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-2 text-xs text-white/30 justify-center">
-                <Lock className="w-3 h-3" />
-                <span>Secure checkout</span>
-                <Shield className="w-3 h-3 ml-2" />
-                <span>SSL encrypted</span>
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted">
+                <Lock className="h-3 w-3" />
+                <span>Price confirmed by the store</span>
               </div>
             </Card>
           </div>

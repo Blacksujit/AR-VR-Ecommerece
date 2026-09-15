@@ -74,7 +74,7 @@ const getOrderQuote = async (req, res, next) => {
   }
 };
 
-const createOrder = async (req, res, next) =>
+const createOrder = async (req, res, next) => {
   const session = await Product.startSession();
 
   try {

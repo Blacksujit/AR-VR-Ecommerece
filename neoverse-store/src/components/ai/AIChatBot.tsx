@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, X, Send, Bot, User, Sparkles, Loader2 } from 'lucide-react'
+import { MessageCircle, X, Send, Bot, Sparkles, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useUIStore } from '@/store/ui-store'
-import { cn } from '@/lib/utils'
+
 
 interface ChatMessage {
   role: 'user' | 'assistant'
@@ -18,6 +18,7 @@ interface ChatMessage {
     discount: number
     images: string[]
     rating: number
+    recommended?: boolean
   }>
 }
 
@@ -26,7 +27,7 @@ export default function AIChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Hi! I'm your AI shopping assistant. Ask me anything about our products — I can help you find items, compare specs, recommend gifts, and more!",
+      content: "Tell me what you are trying to decide. I can compare products, explain available specifications, and point you to AR or 3D inspection when the catalog supports it.",
     },
   ])
   const [input, setInput] = useState('')
@@ -45,11 +46,10 @@ export default function AIChatBot() {
     }
   }, [isOpen])
 
-  useEffect(() => {
-    if (isCartOpen && isOpen) {
-      setIsOpen(false)
-    }
-  }, [isCartOpen, isOpen])
+
+  const openAssistant = () => {
+    if (!isCartOpen) setIsOpen(true)
+  }
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return
@@ -59,13 +59,16 @@ export default function AIChatBot() {
     setIsLoading(true)
 
     try {
-      const res = await api.post<{ success: boolean; data: { reply: string; products?: ChatMessage['products'] } }>(
+      const res = await api.post<{ success: boolean; data: { response: string; products?: ChatMessage['products'] } }>(
         '/ai/chat',
-        { message: userMessage }
+        {
+          message: userMessage,
+          history: messages.slice(-8).map(({ role, content }) => ({ role, content })),
+        }
       )
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: res.data.reply, products: res.data.products },
+        { role: 'assistant', content: res.data.response, products: res.data.products },
       ])
     } catch {
       setMessages((prev) => [
@@ -88,7 +91,7 @@ export default function AIChatBot() {
     <>
       {!isCartOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={openAssistant}
           className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
           aria-label="Open AI Shopping Assistant"
         >
@@ -113,7 +116,7 @@ export default function AIChatBot() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-white">AI Assistant</h3>
-                  <p className="text-[10px] text-white/40">Powered by AI</p>
+                  <p className="text-[10px] text-muted">Catalog guidance</p>
                 </div>
               </div>
               <button
@@ -147,10 +150,10 @@ export default function AIChatBot() {
                               <a
                                 key={p._id}
                                 href={`/products/${p.slug}`}
-                                className="block glass rounded-xl p-2 hover:border-primary/30 transition-all"
+                                className="block rounded-control border border-line bg-panel-soft p-2 transition-colors hover:border-electric/60"
                               >
-                                <p className="text-xs font-medium text-white/90">{p.name}</p>
-                                <p className="text-xs text-primary">${p.price.toFixed(2)}</p>
+                                <p className="text-xs font-medium text-paper">{p.name}</p>
+                                <p className="text-xs text-electric">${p.price.toFixed(2)}{p.recommended ? ' · Suggested match' : ''}</p>
                               </a>
                             ))}
                           </div>
@@ -195,7 +198,7 @@ export default function AIChatBot() {
                 </button>
               </div>
               <p className="text-[10px] text-white/30 mt-1.5 text-center">
-                AI responses are generated and may not be accurate
+                Product details come from the current catalog. Confirm final price at checkout.
               </p>
             </div>
           </motion.div>
