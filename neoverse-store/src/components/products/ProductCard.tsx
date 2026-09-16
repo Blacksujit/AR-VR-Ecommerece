@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Box, CircleAlert, Rotate3D, Star } from 'lucide-react'
+import { CircleAlert, Rotate3D, Star } from 'lucide-react'
 import { cn, formatPrice, calculateDiscountedPrice } from '@/lib/utils'
 import { ProductImage } from '@/components/ui/ProductImage'
 import { Status } from '@/components/ui/status'
