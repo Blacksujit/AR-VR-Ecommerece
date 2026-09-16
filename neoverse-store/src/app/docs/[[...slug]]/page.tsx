@@ -1,5 +1,5 @@
-import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { DocsPage, DocsBody } from 'fumadocs-ui/layouts/docs/page';
+import { getMDXComponents } from '@/components/docs/mdx';
 import { notFound } from 'next/navigation';
 import { source } from '@/lib/source';
 
@@ -20,7 +20,7 @@ export default async function DocsPageRoute({
       <h1>{page.data.title}</h1>
       {page.data.description && <p className="text-fd-muted-foreground text-lg">{page.data.description}</p>}
       <DocsBody>
-        <MDX components={defaultMdxComponents} />
+        <MDX components={getMDXComponents()} />
       </DocsBody>
     </DocsPage>
   );

@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   title: "NeoVerse Store — See it before it arrives",
   description:
     "Inspect furniture, home objects, and design-led technology in 3D or AR before you buy.",
+  icons: {
+    icon: '/logo-mark.svg',
+    shortcut: '/logo-mark.svg',
+    apple: '/logo-mark.svg',
+  },
 };
 
 export default function RootLayout({

@@ -1,0 +1,9 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">NeoVerse logo mark</title>
+  <desc id="desc">A dark aperture surrounding a precise electric-blue object point</desc>
+  <rect width="128" height="128" rx="30" fill="#080B12"/>
+  <path d="M35 30L64 46.5L93 30V63.5L64 80L35 63.5V30Z" stroke="#89A6FF" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M35 64L64 80L93 64" stroke="#C7ED70" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 46.5V80" stroke="#F1EFE8" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="7" fill="#F1EFE8"/>
+</svg>

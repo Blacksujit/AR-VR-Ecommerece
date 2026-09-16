@@ -15,7 +15,7 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
         }}
         links={[
           { text: 'Storefront', url: '/' },
-          { text: 'GitHub', url: 'https://github.com/' },
+          { text: 'GitHub', url: 'https://github.com/Blacksujit/AR-VR-Ecommerece' },
         ]}
         >
           {children}
