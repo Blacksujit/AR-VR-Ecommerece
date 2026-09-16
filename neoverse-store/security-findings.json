@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T16:41:01.578Z",
+  "repository": "neoverse-store",
+  "source": "deterministic-baseline-scanner",
+  "disclaimer": "Candidates require independent validation; pattern matches are not vulnerability verdicts.",
+  "summary": {
+    "candidates": 2,
+    "critical": 1,
+    "high": 1,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [
+    {
+      "id": "SEC-002:backend/ar-vr-ecommerce-c84b0-firebase-adminsdk-fbsvc-0d3bbefabb.json:5",
+      "rule": "SEC-002",
+      "severity": "critical",
+      "status": "candidate",
+      "file": "backend/ar-vr-ecommerce-c84b0-firebase-adminsdk-fbsvc-0d3bbefabb.json",
+      "line": 5,
+      "message": "A private key marker is present in repository text.",
+      "evidence": "\"private_key\": \"-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCW5am1wDoPvOwe\\nLpGULgM9qUT91x+gs13SMtT6rtNfYfrJ08UczhT3Oyr8ATqsuHq34CGWgnx0+xqG\\ny6PbkezdMH7U/BbQASDu5mjNNvxiNtngcjxXPJH03fBXjtfcbqSsJhqLP6FWL+N",
+      "validation": "Confirm the value is real, reachable, and exposed in the deployed environment before filing as a vulnerability."
+    },
+    {
+      "id": "SEC-003:src/lib/firebase.ts:11",
+      "rule": "SEC-003",
+      "severity": "high",
+      "status": "candidate",
+      "file": "src/lib/firebase.ts",
+      "line": 11,
+      "message": "A provider credential pattern is present in a non-example file.",
+      "evidence": "apiKey: 'AIzaSyAI_gHaUUwSKbtX2J3i5iPxWdpnjSr4fAE',",
+      "validation": "Confirm the value is real, reachable, and exposed in the deployed environment before filing as a vulnerability."
+    }
+  ]
+}

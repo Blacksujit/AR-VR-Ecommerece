@@ -1,5 +1,7 @@
 # Node.js
-node_modules/
+node_modules
+security-findings.json
+ar-vr-ecommerce-c84b0-firebase-adminsdk-fbsvc-0d3bbefabb.json/
 
 # Environment variables
 .env

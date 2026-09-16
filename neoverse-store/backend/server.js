@@ -62,12 +62,13 @@ app.use(helmet({
 const allowedOrigins = [
   'http://localhost:3000',
   'https://neoverse-store.vercel.app',
+  'https://neoverse.sujit.top',
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ]
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
-    cb(null, true) // Allow all in dev; tighten for production
+    cb(new Error('Origin is not allowed by CORS'))
   },
   credentials: true,
 }));
