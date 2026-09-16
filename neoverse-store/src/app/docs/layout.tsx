@@ -6,7 +6,8 @@ import { source } from '@/lib/source';
 export default function DocsRootLayout({ children }: { children: ReactNode }) {
   return (
     <RootProvider>
-      <DocsLayout
+      <div className="docs-site">
+        <DocsLayout
         tree={source.getPageTree()}
         nav={{
           title: 'NeoVerse Docs',
@@ -16,9 +17,10 @@ export default function DocsRootLayout({ children }: { children: ReactNode }) {
           { text: 'Storefront', url: '/' },
           { text: 'GitHub', url: 'https://github.com/' },
         ]}
-      >
-        {children}
-      </DocsLayout>
+        >
+          {children}
+        </DocsLayout>
+      </div>
     </RootProvider>
   );
 }

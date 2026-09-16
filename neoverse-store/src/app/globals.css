@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -76,6 +78,40 @@ body {
   color: var(--color-paper);
   font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+.docs-site {
+  --color-fd-background: var(--color-ink);
+  --color-fd-foreground: var(--color-paper);
+  --color-fd-muted-foreground: var(--color-muted);
+  --color-fd-muted: var(--color-panel-soft);
+  --color-fd-card: var(--color-panel);
+  --color-fd-card-foreground: var(--color-paper);
+  --color-fd-popover: var(--color-ink-raised);
+  --color-fd-popover-foreground: var(--color-paper);
+  --color-fd-border: var(--color-line);
+  --color-fd-primary: var(--color-electric);
+  --color-fd-primary-foreground: var(--color-ink);
+  --color-fd-accent: var(--color-panel-soft);
+  --color-fd-accent-foreground: var(--color-paper);
+  min-height: calc(100vh - 4rem);
+  background: var(--color-ink);
+}
+
+.docs-site a {
+  text-underline-offset: 3px;
+}
+
+.docs-site code:not(pre code) {
+  border: 1px solid var(--color-line);
+  background: var(--color-panel-soft);
+  border-radius: 6px;
+  padding: 0.15rem 0.35rem;
+}
+
+.docs-site pre {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-surface);
 }
 
 ::selection {
