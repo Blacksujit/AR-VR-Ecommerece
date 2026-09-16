@@ -150,4 +150,6 @@ claude-skills/
 
 mongodb-string.txt
 
-/claude-skills/
+claude-skills/
+
+.claude\skills
