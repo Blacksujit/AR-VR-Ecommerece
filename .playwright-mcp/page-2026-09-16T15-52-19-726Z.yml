@@ -1,0 +1,366 @@
+- generic [active] [ref=e1]:
+  - navigation "Main navigation" [ref=e2]:
+    - generic [ref=e4]:
+      - link "NeoVerse." [ref=e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Products" [ref=e9] [cursor=pointer]:
+          - /url: /products
+        - link "Categories" [ref=e10] [cursor=pointer]:
+          - /url: /categories
+        - link "VR Showroom" [ref=e11] [cursor=pointer]:
+          - /url: /vr-showroom
+        - link "Contact" [ref=e12] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e13]:
+        - button "Toggle search" [ref=e14]
+        - link "Wishlist" [ref=e18] [cursor=pointer]:
+          - /url: /wishlist
+        - link "Shopping cart" [ref=e21] [cursor=pointer]:
+          - /url: /cart
+        - generic [ref=e25]:
+          - button "Get Started" [ref=e26]
+          - button "Sign In" [ref=e27]
+  - main [ref=e28]:
+    - main [ref=e29]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - paragraph [ref=e34]: Shop with evidence
+          - heading "See how it fits before it arrives." [level=1] [ref=e36]
+          - paragraph [ref=e37]: Explore products in 3D, place them in your space, and buy with the confidence that comes from seeing the details first.
+          - generic [ref=e38]:
+            - link [ref=e39] [cursor=pointer]:
+              - /url: /products
+              - button "Explore products" [ref=e40]
+            - link [ref=e43] [cursor=pointer]:
+              - /url: /vr-showroom
+              - button "Visit the showroom" [ref=e44]
+          - generic [ref=e45]:
+            - generic [ref=e46]: 3D and AR-ready catalog
+            - generic [ref=e50]: No account needed to browse
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: Live product stage
+            - generic [ref=e58]: Rotate to inspect
+          - generic [ref=e63]:
+            - generic [ref=e64]: Interactive preview
+            - generic [ref=e65]: Drag · zoom · reset
+      - generic [ref=e66]:
+        - generic [ref=e70]:
+          - paragraph [ref=e71]: Built for the way people already browse
+          - heading "Open formats. More ways to see." [level=2] [ref=e72]
+          - paragraph [ref=e73]: NeoVerse AR and 3D experiences are built on open, industry-standard formats — no app download required, no proprietary lock-in.
+        - generic [ref=e74]:
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - paragraph [ref=e82]: Apple Quick Look
+              - paragraph [ref=e83]: AR Quick Look on iOS
+              - generic [ref=e84]: iOS AR
+            - generic [ref=e85]:
+              - paragraph [ref=e90]: WebXR
+              - paragraph [ref=e91]: Browser-based AR/VR
+              - generic [ref=e92]: Cross-Platform
+            - generic [ref=e93]:
+              - paragraph [ref=e98]: Google ARCore
+              - paragraph [ref=e99]: Android AR experiences
+              - generic [ref=e100]: Android
+            - generic [ref=e101]:
+              - paragraph [ref=e105]: Meta Quest Browser
+              - paragraph [ref=e106]: VR showroom compatible
+              - generic [ref=e107]: VR
+            - generic [ref=e108]:
+              - paragraph [ref=e112]: Desktop WebGL
+              - paragraph [ref=e113]: 3D preview without headset
+              - generic [ref=e114]: Desktop
+            - generic [ref=e115]:
+              - paragraph [ref=e120]: Android Scene Viewer
+              - paragraph [ref=e121]: GLB model viewing
+              - generic [ref=e122]: Android
+            - generic [ref=e123]:
+              - paragraph [ref=e130]: USDZ / GLB
+              - paragraph [ref=e131]: Industry-standard 3D formats
+              - generic [ref=e132]: Standard
+            - generic [ref=e133]:
+              - paragraph [ref=e138]: Three.js
+              - paragraph [ref=e139]: Web-based 3D rendering
+              - generic [ref=e140]: Web
+          - paragraph [ref=e144]: No special hardware required. All AR experiences work through your mobile browser. VR Showroom is accessible from any desktop or VR-capable browser.
+      - generic [ref=e146]:
+        - generic [ref=e149]:
+          - paragraph [ref=e150]: Start with what matters
+          - heading "Find your next object" [level=2] [ref=e151]
+          - paragraph [ref=e152]: Browse by category, then inspect the products in the space where they will live.
+        - generic [ref=e153]:
+          - link [ref=e156] [cursor=pointer]:
+            - /url: /products?category=beauty
+            - generic [ref=e164]:
+              - heading "Beauty" [level=3] [ref=e165]
+              - paragraph [ref=e166]: 5 Products
+          - link [ref=e169] [cursor=pointer]:
+            - /url: /products?category=fragrances
+            - generic [ref=e177]:
+              - heading "Fragrances" [level=3] [ref=e178]
+              - paragraph [ref=e179]: 5 Products
+          - link [ref=e182] [cursor=pointer]:
+            - /url: /products?category=furniture
+            - generic [ref=e190]:
+              - heading "Furniture" [level=3] [ref=e191]
+              - paragraph [ref=e192]: 5 Products
+          - link [ref=e195] [cursor=pointer]:
+            - /url: /products?category=groceries
+            - generic [ref=e203]:
+              - heading "Groceries" [level=3] [ref=e204]
+              - paragraph [ref=e205]: 27 Products
+          - link [ref=e208] [cursor=pointer]:
+            - /url: /products?category=home-decoration
+            - generic [ref=e216]:
+              - heading "Home Decoration" [level=3] [ref=e217]
+              - paragraph [ref=e218]: 5 Products
+          - link [ref=e221] [cursor=pointer]:
+            - /url: /products?category=kitchen-accessories
+            - generic [ref=e229]:
+              - heading "Kitchen Accessories" [level=3] [ref=e230]
+              - paragraph [ref=e231]: 30 Products
+          - link [ref=e234] [cursor=pointer]:
+            - /url: /products?category=laptops
+            - generic [ref=e241]:
+              - heading "Laptops" [level=3] [ref=e242]
+              - paragraph [ref=e243]: 5 Products
+          - link [ref=e246] [cursor=pointer]:
+            - /url: /products?category=mens-shirts
+            - generic [ref=e254]:
+              - heading "Mens Shirts" [level=3] [ref=e255]
+              - paragraph [ref=e256]: 5 Products
+      - generic [ref=e258]:
+        - generic [ref=e259]:
+          - generic [ref=e260]:
+            - paragraph [ref=e261]: A considered starting point
+            - heading "Objects worth a closer look" [level=2] [ref=e262]
+            - paragraph [ref=e263]: Curated products with the details, dimensions, and immersive tools to help you choose well.
+          - link "View All" [ref=e264] [cursor=pointer]:
+            - /url: /products
+        - generic [ref=e267]:
+          - generic [ref=e269]:
+            - link "View Amazon Echo Plus" [ref=e270] [cursor=pointer]:
+              - /url: /products/amazon-echo-plus-99
+              - generic [ref=e271]: "-12%"
+              - img "Amazon Echo Plus" [ref=e273]
+            - generic [ref=e274]:
+              - paragraph [ref=e275]: Amazon
+              - link [ref=e276] [cursor=pointer]:
+                - /url: /products/amazon-echo-plus-99
+                - heading "Amazon Echo Plus" [level=3] [ref=e277]
+              - generic [ref=e278]: "5.0"
+              - generic [ref=e282]:
+                - generic [ref=e283]: $87.99
+                - generic [ref=e284]: $99.99
+              - button "Add to Cart" [ref=e285]
+          - generic [ref=e290]:
+            - link "View Huawei Matebook X Pro" [ref=e291] [cursor=pointer]:
+              - /url: /products/huawei-matebook-x-pro-80
+              - generic [ref=e292]: "-9%"
+              - img "Huawei Matebook X Pro" [ref=e294]
+            - generic [ref=e295]:
+              - paragraph [ref=e296]: Huawei
+              - link [ref=e297] [cursor=pointer]:
+                - /url: /products/huawei-matebook-x-pro-80
+                - heading "Huawei Matebook X Pro" [level=3] [ref=e298]
+              - generic [ref=e299]: "5.0"
+              - generic [ref=e303]:
+                - generic [ref=e304]: $1,273.99
+                - generic [ref=e305]: $1,399.99
+              - button "Add to Cart" [ref=e306]
+          - generic [ref=e311]:
+            - link "View Rolex Cellini Date Black Dial" [ref=e312] [cursor=pointer]:
+              - /url: /products/rolex-cellini-date-black-dial-95
+              - generic [ref=e313]: "-9%"
+              - img "Rolex Cellini Date Black Dial" [ref=e315]
+            - generic [ref=e316]:
+              - paragraph [ref=e317]: Rolex
+              - link [ref=e318] [cursor=pointer]:
+                - /url: /products/rolex-cellini-date-black-dial-95
+                - heading "Rolex Cellini Date Black Dial" [level=3] [ref=e319]
+              - generic [ref=e320]: "5.0"
+              - generic [ref=e324]:
+                - generic [ref=e325]: $8,189.99
+                - generic [ref=e326]: $8,999.99
+              - button "Add to Cart" [ref=e327]
+          - generic [ref=e332]:
+            - link "View Water" [ref=e333] [cursor=pointer]:
+              - /url: /products/water-42
+              - generic [ref=e334]: "-15%"
+              - img "Water" [ref=e336]
+            - generic [ref=e337]:
+              - paragraph [ref=e338]: groceries
+              - link [ref=e339] [cursor=pointer]:
+                - /url: /products/water-42
+                - heading "Water" [level=3] [ref=e340]
+              - generic [ref=e341]: "5.0"
+              - generic [ref=e345]:
+                - generic [ref=e346]: $0.84
+                - generic [ref=e347]: $0.99
+              - button "Add to Cart" [ref=e348]
+          - generic [ref=e353]:
+            - link "View Mulberry" [ref=e354] [cursor=pointer]:
+              - /url: /products/mulberry-33
+              - generic [ref=e355]: "-13%"
+              - img "Mulberry" [ref=e357]
+            - generic [ref=e358]:
+              - paragraph [ref=e359]: groceries
+              - link [ref=e360] [cursor=pointer]:
+                - /url: /products/mulberry-33
+                - heading "Mulberry" [level=3] [ref=e361]
+              - generic [ref=e362]: "5.0"
+              - generic [ref=e366]:
+                - generic [ref=e367]: $4.34
+                - generic [ref=e368]: $4.99
+              - button "Add to Cart" [ref=e369]
+          - generic [ref=e374]:
+            - link "View Kiwi" [ref=e375] [cursor=pointer]:
+              - /url: /products/kiwi-30
+              - generic [ref=e376]: "-15%"
+              - img "Kiwi" [ref=e378]
+            - generic [ref=e379]:
+              - paragraph [ref=e380]: groceries
+              - link [ref=e381] [cursor=pointer]:
+                - /url: /products/kiwi-30
+                - heading "Kiwi" [level=3] [ref=e382]
+              - generic [ref=e383]: "4.9"
+              - generic [ref=e387]:
+                - generic [ref=e388]: $2.12
+                - generic [ref=e389]: $2.49
+              - button "Add to Cart" [ref=e390]
+          - generic [ref=e395]:
+            - link "View Lunch Box" [ref=e396] [cursor=pointer]:
+              - /url: /products/lunch-box-65
+              - generic [ref=e397]: "-10%"
+              - img "Lunch Box" [ref=e399]
+            - generic [ref=e400]:
+              - paragraph [ref=e401]: kitchen-accessories
+              - link [ref=e402] [cursor=pointer]:
+                - /url: /products/lunch-box-65
+                - heading "Lunch Box" [level=3] [ref=e403]
+              - generic [ref=e404]: "4.9"
+              - generic [ref=e408]:
+                - generic [ref=e409]: $11.69
+                - generic [ref=e410]: $12.99
+              - button "Add to Cart" [ref=e411]
+          - generic [ref=e416]:
+            - link "View Heshe Women's Leather Bag" [ref=e417] [cursor=pointer]:
+              - /url: /products/heshe-women-s-leather-bag-173
+              - generic [ref=e418]: "-4%"
+              - img "Heshe Women's Leather Bag" [ref=e420]
+            - generic [ref=e421]:
+              - paragraph [ref=e422]: Heshe
+              - link [ref=e423] [cursor=pointer]:
+                - /url: /products/heshe-women-s-leather-bag-173
+                - heading "Heshe Women's Leather Bag" [level=3] [ref=e424]
+              - generic [ref=e425]: "4.9"
+              - generic [ref=e429]:
+                - generic [ref=e430]: $124.79
+                - generic [ref=e431]: $129.99
+              - button "Add to Cart" [ref=e432]
+      - generic [ref=e437]:
+        - generic [ref=e440]:
+          - paragraph [ref=e441]: The difference is practical
+          - heading "Confidence, built into the product page" [level=2] [ref=e442]
+          - paragraph [ref=e443]: Immersive tools should answer real buying questions, not compete for attention.
+        - generic [ref=e444]:
+          - generic [ref=e448]:
+            - heading "AR/VR Shopping" [level=3] [ref=e453]
+            - paragraph [ref=e454]: Try before you buy with immersive augmented reality. Place products in your real environment or explore them in full VR showrooms.
+          - generic [ref=e458]:
+            - heading "AI Recommendations" [level=3] [ref=e463]
+            - paragraph [ref=e464]: Our intelligent engine learns your preferences and style, delivering hyper-personalized product suggestions that get better every time.
+          - generic [ref=e468]:
+            - heading "Premium Quality" [level=3] [ref=e472]
+            - paragraph [ref=e473]: Every product is verified, tested, and backed by our premium quality guarantee. Shop with confidence and complete purchase protection.
+      - generic [ref=e475]:
+        - generic [ref=e478]:
+          - paragraph [ref=e479]: A simpler way to decide
+          - heading "See the answer in your space." [level=2] [ref=e480]
+          - paragraph [ref=e481]: Every product page removes the single biggest doubt — fit, scale, or material — before you add to cart.
+        - generic [ref=e482]:
+          - paragraph [ref=e499]: True scale
+          - generic [ref=e506]:
+            - generic [ref=e516]:
+              - generic [ref=e517]: Step 01
+              - paragraph [ref=e518]: “Will the color match my room?”
+              - heading "Point your camera and the product renders in your actual lighting. See the true shade, not a studio photo." [level=3] [ref=e519]
+            - generic [ref=e532]:
+              - generic [ref=e533]: Step 02
+              - paragraph [ref=e534]: “Will it fit in that corner?”
+              - heading "Place the 3D model at true scale. Walk around it, move it, adjust — before you commit a cent." [level=3] [ref=e535]
+            - generic [ref=e544]:
+              - generic [ref=e545]: Step 03
+              - paragraph [ref=e546]: “What if it looks different in person?”
+              - heading "You've already seen it in your space from every angle. Buy with confidence — no surprises, no 'not what I expected' returns." [level=3] [ref=e547]
+      - generic [ref=e554]:
+        - heading "New objects, useful updates." [level=2] [ref=e559]
+        - paragraph [ref=e560]: Get occasional notes about new products, spatial tools, and practical buying guides.
+        - generic [ref=e562]:
+          - textbox "Enter your email" [ref=e566]
+          - button "Subscribe" [ref=e567]
+        - generic [ref=e570]: No spam. Unsubscribe anytime.
+  - contentinfo [ref=e575]:
+    - generic [ref=e577]:
+      - generic [ref=e578]:
+        - link "NeoVerse." [ref=e579] [cursor=pointer]:
+          - /url: /
+        - paragraph [ref=e580]: "A more considered way to shop: inspect the object, place it in your space, and decide with better information."
+        - generic [ref=e581]:
+          - link "GitHub" [ref=e582] [cursor=pointer]:
+            - /url: https://github.com
+          - link "Twitter" [ref=e587] [cursor=pointer]:
+            - /url: https://twitter.com
+          - link "Instagram" [ref=e590] [cursor=pointer]:
+            - /url: https://instagram.com
+          - link "YouTube" [ref=e594] [cursor=pointer]:
+            - /url: https://youtube.com
+      - generic [ref=e597]:
+        - heading "Explore" [level=2] [ref=e598]
+        - list [ref=e599]:
+          - listitem [ref=e600]:
+            - link "Home" [ref=e601] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=e602]:
+            - link "Products" [ref=e603] [cursor=pointer]:
+              - /url: /products
+          - listitem [ref=e604]:
+            - link "VR Showroom" [ref=e605] [cursor=pointer]:
+              - /url: /vr-showroom
+          - listitem [ref=e606]:
+            - link "About" [ref=e607] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e608]:
+            - link "Contact" [ref=e609] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e610]:
+        - heading "Support" [level=2] [ref=e611]
+        - list [ref=e612]:
+          - listitem [ref=e613]:
+            - link "FAQ" [ref=e614] [cursor=pointer]:
+              - /url: /faq
+          - listitem [ref=e615]:
+            - link "Shipping" [ref=e616] [cursor=pointer]:
+              - /url: /shipping
+          - listitem [ref=e617]:
+            - link "Returns" [ref=e618] [cursor=pointer]:
+              - /url: /returns
+          - listitem [ref=e619]:
+            - link "Size Guide" [ref=e620] [cursor=pointer]:
+              - /url: /size-guide
+          - listitem [ref=e621]:
+            - link "Privacy" [ref=e622] [cursor=pointer]:
+              - /url: /privacy
+      - generic [ref=e623]:
+        - heading "A better way to decide" [level=2] [ref=e624]
+        - paragraph [ref=e625]: Browse the catalog and use 3D or AR when you need more evidence before buying.
+        - link "Explore the catalog" [ref=e626] [cursor=pointer]:
+          - /url: /products
+    - generic [ref=e628]:
+      - paragraph [ref=e629]: © 2026 NeoVerse Store. All rights reserved.
+      - paragraph [ref=e630]: Designed for confidence before checkout.
+  - button "Open AI Shopping Assistant" [ref=e631]

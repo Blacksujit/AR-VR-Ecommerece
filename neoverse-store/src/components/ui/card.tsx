@@ -9,7 +9,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(({ className, variant = 'defa
   const variants = {
     default: 'rounded-surface border border-line bg-panel',
     glass: 'rounded-surface border border-line bg-panel/85 backdrop-blur-xl',
-    glow: 'rounded-surface border border-electric/25 bg-panel shadow-glow',
+    glow: 'rounded-surface border border-electric/25 bg-panel',
   }
 
   return <div ref={ref} className={cn(variants[variant], className)} {...props} />
