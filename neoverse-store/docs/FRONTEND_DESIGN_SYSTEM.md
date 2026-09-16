@@ -252,7 +252,31 @@ Before shipping a frontend change, ask:
 - Does the component still make sense if imagery fails?
 - Is the change reusable, or is it a one-off style workaround?
 
-## 9. Implementation sequence
+## 9. React Doctor inspection
+
+React Doctor is installed as a development dependency and provides a deterministic inspection pass for React correctness, maintainability, performance, accessibility, and design patterns.
+
+Run the general inspection:
+
+```bash
+npm run react-doctor
+```
+
+Run the design-focused inspection:
+
+```bash
+npm run react-doctor:design
+```
+
+Generate a local JSON report without score/telemetry output:
+
+```bash
+npm run react-doctor:json
+```
+
+The generated `react-doctor-*.json` files are local diagnostics and are ignored by Git. Treat warnings as review input, not automatic proof of a defect. Prioritize findings that affect mobile viewport behavior, accessible interaction, dynamic numeric alignment, product evidence hierarchy, or repeated component complexity.
+
+## 10. Implementation sequence
 
 1. Tokens and primitive behavior.
 2. App shell and navigation hierarchy.

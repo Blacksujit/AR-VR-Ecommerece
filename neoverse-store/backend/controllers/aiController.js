@@ -171,6 +171,8 @@ RULES:
       ]);
     }
 
+    const recommendationIdSet = new Set(recommendationIds.map((id) => id.toString()));
+
     res.json({
       success: true,
       data: {
@@ -184,7 +186,7 @@ RULES:
           images: p.images,
           rating: p.rating,
           category: p.category,
-          recommended: recommendationIds.includes(p._id.toString()),
+          recommended: recommendationIdSet.has(p._id.toString()),
         })),
         provider: model,
         model: providerModel,

@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+react-doctor-*.json
 
 # next.js
 /.next/

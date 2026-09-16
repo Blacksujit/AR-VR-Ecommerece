@@ -113,13 +113,18 @@ const createOrder = async (req, res, next) => {
 
     let order;
     await session.withTransaction(async () => {
-      for (const item of orderItems) {
-        const updated = await Product.findOneAndUpdate(
-          { _id: item.product, stock: { $gte: item.quantity } },
-          { $inc: { stock: -item.quantity } },
-          { new: true, session }
-        );
-        if (!updated) throw new AppError('Inventory changed. Please review your cart and try again.', 409);
+      const inventoryUpdates = await Product.bulkWrite(
+        orderItems.map((item) => ({
+          updateOne: {
+            filter: { _id: item.product, stock: { $gte: item.quantity } },
+            update: { $inc: { stock: -item.quantity } },
+          },
+        })),
+        { session }
+      );
+
+      if (inventoryUpdates.modifiedCount !== orderItems.length) {
+        throw new AppError('Inventory changed. Please review your cart and try again.', 409);
       }
 
       [order] = await Order.create([{

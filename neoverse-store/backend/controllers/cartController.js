@@ -106,16 +106,19 @@ const mergeCart = async (req, res, next) => {
       cart = await Cart.create({ user: req.user._id, items: [] });
     }
 
-    for (const incoming of items) {
-      const product = await Product.findById(incoming.productId);
-      if (!product) continue;
+    const products = await Promise.all(
+      items.map((incoming) => Product.findById(incoming.productId))
+    );
+
+    items.forEach((incoming, index) => {
+      if (!products[index]) return;
       const existing = cart.items.find((item) => item.product.toString() === incoming.productId);
       if (existing) {
         existing.quantity = Math.max(existing.quantity, incoming.quantity || 1);
       } else {
         cart.items.push({ product: incoming.productId, quantity: incoming.quantity || 1 });
       }
-    }
+    });
 
     await cart.save();
     const updated = await Cart.findById(cart._id).populate('items.product');
