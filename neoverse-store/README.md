@@ -9,7 +9,8 @@ The project is organized as a modular monolith split into two deployable applica
 
 Production URLs:
 
-- Web: [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+- Web: [https://neoverse.sujit.top/](https://neoverse.sujit.top/)
+- Vercel deployment origin: [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
 - API health endpoint: configure the deployed API URL and check `/api/health`
 
 ## Project status
@@ -319,9 +320,9 @@ Set the web environment variables in the Vercel project. In particular, verify t
 After deployment, verify:
 
 ```bash
-curl -I https://neoverse-store.vercel.app
-curl https://neoverse-store.vercel.app/api/categories
-curl 'https://neoverse-store.vercel.app/api/products?limit=1'
+curl -I https://neoverse.sujit.top/
+curl https://neoverse.sujit.top/api/categories
+curl 'https://neoverse.sujit.top/api/products?limit=1'
 ```
 
 ### API on Render

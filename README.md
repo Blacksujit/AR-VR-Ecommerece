@@ -39,7 +39,8 @@ The repository contains two deployable applications:
 
 ### Available now
 
-- Live Next.js storefront: [neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+- Live storefront: [neoverse.sujit.top](https://neoverse.sujit.top/)
+- Vercel deployment origin: [neoverse-store.vercel.app](https://neoverse-store.vercel.app)
 - Product browsing, search, filtering, sorting, and category pages.
 - Product detail and inspection surfaces.
 - Persistent cart and wishlist state.
@@ -93,7 +94,9 @@ It provides:
 - 3D, AR, and VR-related experiences where supported by the device and product data.
 - Catalog-grounded shopping assistance through the API.
 
-Production URL: [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+Production URL: [https://neoverse.sujit.top/](https://neoverse.sujit.top/)
+
+Vercel deployment origin: [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
 
 ### API
 
@@ -333,9 +336,9 @@ curl https://<api-host>/api/health
 Verify the Vercel deployment:
 
 ```bash
-curl -I https://neoverse-store.vercel.app
-curl https://neoverse-store.vercel.app/api/categories
-curl "https://neoverse-store.vercel.app/api/products?limit=1"
+curl -I https://neoverse.sujit.top/
+curl https://neoverse.sujit.top/api/categories
+curl "https://neoverse.sujit.top/api/products?limit=1"
 ```
 
 ## Documentation map
