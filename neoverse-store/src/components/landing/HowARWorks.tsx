@@ -1,6 +1,6 @@
 'use client'
 
-import { Camera, Ruler, ShieldCheck, type LucideIcon } from 'lucide-react'
+import { CircleDollarSign, Ruler, Search, type LucideIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 
@@ -15,24 +15,24 @@ interface Step {
 const steps: Step[] = [
   {
     number: '01',
-    icon: Camera,
-    doubt: 'Will the color match my room?',
+    icon: Search,
+    doubt: 'Which details actually matter?',
     resolution:
-      'Point your camera and the product renders in your actual lighting. See the true shade, not a studio photo.',
+      'Start with the product facts that affect the decision: dimensions, material, rating, price, and current availability.',
   },
   {
     number: '02',
     icon: Ruler,
-    doubt: 'Will it fit in that corner?',
+    doubt: 'Will the shape and scale work here?',
     resolution:
-      'Place the 3D model at true scale. Walk around it, move it, adjust — before you commit a cent.',
+      'Open the available 3D or spatial tool when the product supports it, then inspect the object from the angle that matters to you.',
   },
   {
     number: '03',
-    icon: ShieldCheck,
-    doubt: 'What if it looks different in person?',
+    icon: CircleDollarSign,
+    doubt: 'What will I pay today?',
     resolution:
-      "You've already seen it in your space from every angle. Buy with confidence — no surprises, no 'not what I expected' returns.",
+      'Get a server-calculated quote before payment so the price, shipping, tax, discounts, and stock are checked together.',
   },
 ]
 
@@ -43,40 +43,40 @@ export function HowARWorks() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <p className="mb-3 text-sm font-medium text-electric">A simpler way to decide</p>
+            <p className="mb-3 text-sm font-medium text-electric">From uncertainty to a useful answer</p>
             <h2 className="text-3xl font-display font-semibold tracking-tight text-paper sm:text-4xl lg:text-5xl">
-              See the answer in your space.
+              Inspect what matters before you buy.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-              Every product page removes the single biggest doubt — fit, scale, or
-              material — before you add to cart.
+              A better product decision starts with evidence, not more promotional copy.
             </p>
           </div>
         </ScrollReveal>
 
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           <div className="flex-1 relative max-w-md mx-auto lg:mx-0">
+            <div className="mb-4 text-sm text-muted">A purchase decision, made visible</div>
             <div className="relative aspect-9/16 max-w-70 mx-auto">
               <div className="absolute inset-0 rounded-[40px] border border-electric/20 bg-panel shadow-glow" />
               <div
                 className="relative inset-4 flex flex-col items-center justify-center overflow-hidden rounded-4xl border border-line bg-panel p-6"
                 style={{ margin: 16 }}
               >
-                <Camera className="mb-4 h-10 w-10 text-electric" />
+                <Search className="mb-4 h-10 w-10 text-electric" />
                 <div className="mb-4 flex aspect-square w-full items-center justify-center rounded-surface border border-line bg-panel-soft">
                   <div className="text-center">
                     <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-control border border-line bg-panel">
                       <Ruler className="h-8 w-8 text-electric" />
                     </div>
-                    <p className="text-xs text-muted">True scale</p>
+                    <p className="text-xs text-muted">Product evidence</p>
                   </div>
                 </div>
                 <div className="w-full space-y-2">
-                  <div className="h-2 rounded-full bg-panel-soft" />
-                  <div className="h-2 w-2/3 rounded-full bg-panel-soft" />
+                  <div className="flex items-center justify-between border-b border-line pb-2 text-xs text-muted"><span>Price</span><span className="tabular-nums text-paper">Verified at checkout</span></div>
+                  <div className="flex items-center justify-between border-b border-line pb-2 text-xs text-muted"><span>Availability</span><span className="text-accent">Checked live</span></div>
                 </div>
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                  <div className="w-24 h-1 rounded-full bg-white/20" />
+                  <div className="w-24 h-1 rounded-full bg-line-strong" />
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Sparkles, Shield, type LucideIcon } from 'lucide-react'
+import { CircleDollarSign, Ruler, SearchCheck, type LucideIcon } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Card } from '@/components/ui/card'
 
@@ -13,24 +13,24 @@ interface Benefit {
 
 const benefits: Benefit[] = [
   {
-    icon: Box,
-    title: 'AR/VR Shopping',
+    icon: SearchCheck,
+    title: 'See the useful details',
     description:
-      'Try before you buy with immersive augmented reality. Place products in your real environment or explore them in full VR showrooms.',
+      'Product pages bring specifications, ratings, availability, and imagery together so comparison does not require a dozen tabs.',
 
   },
   {
-    icon: Sparkles,
-    title: 'AI Recommendations',
+    icon: Ruler,
+    title: 'Check fit and proportion',
     description:
-      'Our intelligent engine learns your preferences and style, delivering hyper-personalized product suggestions that get better every time.',
+      'Use supported 3D and spatial tools to understand scale and form before an object arrives at your door.',
 
   },
   {
-    icon: Shield,
-    title: 'Premium Quality',
+    icon: CircleDollarSign,
+    title: 'Know what you are paying',
     description:
-      'Every product is verified, tested, and backed by our premium quality guarantee. Shop with confidence and complete purchase protection.',
+      'Checkout quotes are calculated on the server with current pricing, discounts, shipping, tax, and stock checks.'
 
   },
 ]
@@ -45,8 +45,8 @@ export function WhyNeoVerse() {
             <h2 className="text-3xl font-display font-semibold tracking-tight text-paper sm:text-4xl lg:text-5xl">
               Confidence, built into the product page
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-              Immersive tools should answer real buying questions, not compete for attention.
+            <p className="mt-4 max-w-xl text-lg text-muted">
+              The experience is built around the questions that usually create hesitation.
             </p>
           </div>
         </ScrollReveal>
