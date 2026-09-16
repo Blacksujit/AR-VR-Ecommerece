@@ -26,14 +26,6 @@ const sortOptions = [
   { label: 'Most Popular', value: 'popular' },
 ] as const
 
-const gradientMap: Record<string, string> = {
-  'Gaming': 'from-red-600/20 to-rose-600/20',
-  'Audio': 'from-blue-600/20 to-cyan-600/20',
-  'Computing': 'from-purple-600/20 to-pink-600/20',
-  'Wearables': 'from-emerald-600/20 to-teal-600/20',
-  'Smart Home': 'from-slate-600/20 to-zinc-600/20',
-  'Photography': 'from-amber-600/20 to-orange-600/20',
-}
 
 interface ProductListingClientProps {
   initialFilters: { [key: string]: string | string[] | undefined }
@@ -170,7 +162,7 @@ export default function ProductListingClient({ initialFilters, initialData, init
           )}
         </div>
 
-        <ProductGrid products={products} viewMode={viewMode} isLoading={isLoading} gradientMap={gradientMap} />
+        <ProductGrid products={products} viewMode={viewMode} isLoading={isLoading} />
 
         <PaginationBar currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>

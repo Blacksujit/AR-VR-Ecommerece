@@ -5,23 +5,15 @@ import { cn } from '@/lib/utils'
 import { ProductCard } from './ProductCard'
 import type { ProductItem } from '@/lib/product-types'
 
-const defaultGradientMap: Record<string, string> = {
-  'Gaming': 'from-red-600/20 to-rose-600/20',
-  'Audio': 'from-blue-600/20 to-cyan-600/20',
-  'Computing': 'from-purple-600/20 to-pink-600/20',
-  'Wearables': 'from-emerald-600/20 to-teal-600/20',
-  'Smart Home': 'from-slate-600/20 to-zinc-600/20',
-  'Photography': 'from-amber-600/20 to-orange-600/20',
-}
 
 interface ProductGridProps {
   products: ProductItem[]
   viewMode: 'grid' | 'list'
   isLoading: boolean
-  gradientMap?: Record<string, string>
+
 }
 
-export function ProductGrid({ products, viewMode, isLoading, gradientMap = defaultGradientMap }: ProductGridProps) {
+export function ProductGrid({ products, viewMode, isLoading }: ProductGridProps) {
   if (isLoading) {
     return (
       <div className={cn(
@@ -67,7 +59,7 @@ export function ProductGrid({ products, viewMode, isLoading, gradientMap = defau
           product={product}
           index={index}
           viewMode={viewMode}
-          gradientMap={gradientMap}
+
         />
       ))}
     </div>
