@@ -2,9 +2,64 @@
 
 NeoVerse Store is an immersive commerce application focused on helping customers make better purchase decisions through product inspection, spatial visualization, and catalog-grounded assistance.
 
-The repository currently contains a Next.js storefront and a separate Express API. The web application is deployed on Vercel. The API is configured for deployment on Render and uses MongoDB for server-side commerce data.
+The repository contains two deployable applications:
 
-> The project is an active build. The storefront is live, but the catalog and checkout systems still need to be unified before unrestricted production commerce is enabled.
+- A **Next.js storefront** deployed to Vercel.
+- An **Express API** backed by MongoDB and configured for deployment to Render.
+
+> The project is an active build. The storefront is live, but the catalog and checkout systems must be unified before unrestricted production commerce is enabled.
+
+## Table of contents
+
+- [Project status](#project-status)
+- [Repository structure](#repository-structure)
+- [System overview](#system-overview)
+  - [Web application](#web-application)
+  - [API](#api)
+  - [Current production boundary](#current-production-boundary)
+- [Architecture flow](#architecture-flow)
+  - [Request boundaries](#request-boundaries)
+- [Quick start](#quick-start)
+  - [Requirements](#requirements)
+  - [Install dependencies](#install-dependencies)
+  - [Configure the web app](#configure-the-web-app)
+  - [Configure the API](#configure-the-api)
+  - [Run locally](#run-locally)
+  - [Seed and synchronize catalog data](#seed-and-synchronize-catalog-data)
+- [Useful commands](#useful-commands)
+- [Deployment](#deployment)
+  - [Deploy the web app to Vercel](#deploy-the-web-app-to-vercel)
+  - [Deploy the API to Render](#deploy-the-api-to-render)
+  - [Verify a deployment](#verify-a-deployment)
+- [Documentation map](#documentation-map)
+- [Engineering priorities](#engineering-priorities)
+- [License](#license)
+
+## Project status
+
+### Available now
+
+- Live Next.js storefront: [neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+- Product browsing, search, filtering, sorting, and category pages.
+- Product detail and inspection surfaces.
+- Persistent cart and wishlist state.
+- Checkout quote integration.
+- Account and dashboard pages.
+- 3D, AR, and VR-related experiences where supported by the device and product data.
+- Express API routes for commerce, accounts, reviews, recommendations, uploads, email, payments, and AI assistance.
+- Server-side pricing and inventory validation in the API order flow.
+
+### Important production limitation
+
+The public web catalog currently uses the DummyJSON provider through the Next.js application. The Express commerce API uses MongoDB product records.
+
+These sources can expose different product identifiers. For example, the web catalog can return IDs such as `dummyjson-1`, while the order system expects MongoDB product records. This must be resolved before production checkout is treated as fully reliable.
+
+The intended direction is:
+
+1. MongoDB becomes the production catalog source of truth.
+2. Product prices, inventory, capabilities, and identifiers are shared by browsing, quote, order, and Stripe flows.
+3. DummyJSON remains an explicit development or synchronization source rather than an independent checkout catalog.
 
 ## Repository structure
 
@@ -22,7 +77,7 @@ AR-VR-Assignment/
     └── vercel.json           # Vercel configuration
 ```
 
-## Applications
+## System overview
 
 ### Web application
 
@@ -38,9 +93,7 @@ It provides:
 - 3D, AR, and VR-related experiences where supported by the device and product data.
 - Catalog-grounded shopping assistance through the API.
 
-Production URL:
-
-- [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
+Production URL: [https://neoverse-store.vercel.app](https://neoverse-store.vercel.app)
 
 ### API
 
@@ -56,25 +109,13 @@ It provides the server boundary for:
 - Cart, wishlist, reviews, recommendations, uploads, contact, and email operations.
 - Claude-based shopping assistance with existing provider fallbacks.
 
-The API has a public liveness route:
+Public liveness route:
 
 ```text
 GET /api/health
 ```
 
 The deployed API URL is environment-specific and is intentionally not hard-coded here. Configure it in the web app as `NEXT_PUBLIC_API_URL`.
-
-## Current production boundary
-
-The public web catalog currently uses the DummyJSON provider through the Next.js application. The Express commerce API uses MongoDB product records.
-
-These sources currently expose different product identifiers. For example, the web catalog can return IDs such as `dummyjson-1`, while the order system expects MongoDB product records. This must be resolved before production checkout is treated as fully reliable.
-
-The intended direction is:
-
-1. MongoDB becomes the production catalog source of truth.
-2. Product prices, inventory, capabilities, and identifiers are shared by browsing, quote, order, and Stripe flows.
-3. DummyJSON remains an explicit development or synchronization source rather than an independent checkout catalog.
 
 ## Architecture flow
 
@@ -85,31 +126,31 @@ flowchart TD
     customer[Customer browser]
 
     subgraph vercel[Vercel]
-        web[Next.js storefront\nApp Router and route handlers]
+        web[Next.js storefront<br/>App Router and route handlers]
         webState[Zustand cart and wishlist state]
-        webCatalog[Product provider layer\nCurrent public fallback: DummyJSON]
+        webCatalog[Product provider layer<br/>Current public fallback: DummyJSON]
     end
 
     subgraph render[Render or another Node host]
         api[Express API]
         middleware[Security, CORS, rate limits, auth middleware]
         routes[Commerce and domain routes]
-        services[Business services\npricing, inventory, AI, media, email]
+        services[Business services<br/>pricing, inventory, AI, media, email]
     end
 
-    mongo[(MongoDB\nproducts, users, carts, orders, reviews)]
-    firebase[Firebase Auth\nand Firebase Admin]
-    stripe[Stripe Checkout\nand webhooks]
-    anthropic[Anthropic Claude\nshopping assistant]
-    fallbacks[OpenAI or Gemini\nconfigured fallback providers]
-    cloudinary[Cloudinary\nproduct and upload media]
-    resend[Resend\ntransactional email]
-    dummyjson[(DummyJSON\ndevelopment or sync source)]
+    mongo[(MongoDB<br/>products, users, carts, orders, reviews)]
+    firebase[Firebase Auth<br/>and Firebase Admin]
+    stripe[Stripe Checkout<br/>and webhooks]
+    anthropic[Anthropic Claude<br/>shopping assistant]
+    fallbacks[OpenAI or Gemini<br/>configured fallback providers]
+    cloudinary[Cloudinary<br/>product and upload media]
+    resend[Resend<br/>transactional email]
+    dummyjson[(DummyJSON<br/>development or sync source)]
 
     customer --> web
     web --> webState
     web -->|public catalog requests| webCatalog
-    web -->|API requests\nNEXT_PUBLIC_API_URL| api
+    web -->|API requests<br/>NEXT_PUBLIC_API_URL| api
 
     api --> middleware
     middleware --> routes
@@ -225,6 +266,8 @@ Open:
 - Web app: [http://localhost:3000](http://localhost:3000)
 - API health: [http://localhost:5000/api/health](http://localhost:5000/api/health)
 
+### Seed and synchronize catalog data
+
 If MongoDB is empty, the API can synchronize products and categories from its external product service. The seed utility can also be run explicitly:
 
 ```bash
@@ -239,23 +282,23 @@ Review the synchronization behavior before using it against a production databas
 Run from `neoverse-store/`:
 
 ```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-npx tsc --noEmit
+npm run dev       # Start the Next.js development server
+npm run build     # Create a production build
+npm run start     # Serve the production build
+npm run lint      # Run ESLint
+npx tsc --noEmit  # Type-check without emitting files
 ```
 
 Run from `neoverse-store/backend/`:
 
 ```bash
-npm run dev
-npm start
+npm run dev       # Start Express with nodemon
+npm start         # Start Express with Node.js
 ```
 
 ## Deployment
 
-### Vercel
+### Deploy the web app to Vercel
 
 The web app is configured through [`neoverse-store/vercel.json`](./neoverse-store/vercel.json).
 
@@ -267,15 +310,7 @@ npx vercel deploy --prod --yes
 
 Set `NEXT_PUBLIC_API_URL` in the Vercel production environment to the deployed API base URL, including `/api`.
 
-Verify after deployment:
-
-```bash
-curl -I https://neoverse-store.vercel.app
-curl https://neoverse-store.vercel.app/api/categories
-curl "https://neoverse-store.vercel.app/api/products?limit=1"
-```
-
-### Render
+### Deploy the API to Render
 
 The API deployment is described in [`neoverse-store/backend/render.yaml`](./neoverse-store/backend/render.yaml).
 
@@ -285,10 +320,22 @@ The service uses:
 - Build command: `npm install`
 - Start command: `npm start`
 
-After configuring the required environment variables, verify the service before connecting it to Vercel:
+Configure the required environment variables in Render before starting the service.
+
+### Verify a deployment
+
+Verify the API before connecting it to Vercel:
 
 ```bash
 curl https://<api-host>/api/health
+```
+
+Verify the Vercel deployment:
+
+```bash
+curl -I https://neoverse-store.vercel.app
+curl https://neoverse-store.vercel.app/api/categories
+curl "https://neoverse-store.vercel.app/api/products?limit=1"
 ```
 
 ## Documentation map
