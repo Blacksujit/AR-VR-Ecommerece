@@ -1,4 +1,7 @@
 # Ignore specific files and directories
+
+# Windows reserved device names
+nul
 # Node.js
 node_modules/
 

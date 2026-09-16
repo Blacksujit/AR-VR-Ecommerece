@@ -1,0 +1,38 @@
+---
+title: Contributing
+description: Make changes that preserve the inspection-first product experience.
+icon: GitPullRequest
+---
+
+# Contributing
+
+Keep changes focused, evidence-led, and compatible with the existing product boundaries.
+
+## Before changing code
+
+1. Read the nearest route and component contract.
+2. Check whether the data is authoritative or a development fallback.
+3. Preserve loading, empty, error, unavailable, and unsupported states.
+4. Prefer existing primitives and tokens over one-off styles.
+5. Keep immersive dependencies off routes that do not need them.
+
+## Before opening a change
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run react-doctor:design
+```
+
+For API changes, also test the affected route with a local MongoDB and verify authorization, validation, and failure paths.
+
+## Quality bar
+
+Ask:
+
+- Does this reduce uncertainty or only add visual noise?
+- Is the next action obvious without hover?
+- Are claims supported by real product data?
+- Does the feature work if imagery or a model fails?
+- Does it remain usable with keyboard navigation and reduced motion?

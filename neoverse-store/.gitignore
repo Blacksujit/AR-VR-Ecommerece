@@ -14,6 +14,9 @@
 /coverage
 react-doctor-*.json
 
+# Fumadocs generated source
+.source/
+
 # next.js
 /.next/
 /out/

@@ -1,0 +1,35 @@
+---
+title: Security and trust boundaries
+description: Security practices for the storefront, API, credentials, and AI features.
+icon: ShieldCheck
+---
+
+# Security and trust boundaries
+
+Security is part of the product experience because customers need to trust the price, account, and payment path.
+
+## Non-negotiables
+
+- Keep secrets server-side.
+- Do not commit Firebase service-account files or provider credentials.
+- Fail closed for unknown production CORS origins.
+- Verify Firebase tokens at the API boundary.
+- Verify Stripe webhook signatures.
+- Validate and authorize resource ownership on account and order routes.
+- Rate-limit public and AI-heavy operations.
+- Treat model output as untrusted text, not executable authority.
+
+## AI assistant boundary
+
+The shopping assistant should receive bounded catalog context and conversation history. Provider credentials never belong in browser-exposed variables. Assistant answers should not override server pricing, stock, checkout, or account authorization.
+
+## Local security scan
+
+The repository includes a deterministic security harness for common credential, CORS, and secret-logging risks:
+
+```bash
+cd backend
+node security-harness.js
+```
+
+The scan is an engineering aid, not a substitute for credential rotation, dependency review, or production monitoring.

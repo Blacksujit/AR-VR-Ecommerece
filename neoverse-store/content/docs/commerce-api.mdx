@@ -1,0 +1,38 @@
+---
+title: Commerce API
+description: The server boundary for pricing, inventory, checkout, and protected integrations.
+icon: Server
+---
+
+# Commerce API
+
+The Express API is the authority for operations where correctness or credentials matter. The browser may request a quote, but it cannot decide the final price, stock, tax, shipping, or payment state.
+
+## Health check
+
+```http
+GET /api/health
+```
+
+## Commerce responsibilities
+
+- MongoDB-backed products and categories
+- Server-side pricing, discounts, shipping, tax, and stock checks
+- Cart synchronization and checkout quotes
+- Order creation and Stripe Checkout
+- Signed Stripe webhook handling
+- Firebase Admin token verification
+- Reviews, recommendations, uploads, contact, and email operations
+- Catalog-grounded shopping assistance
+
+## Request rule
+
+Treat client values as intent, not truth. On checkout, the API should load authoritative product records, validate availability, calculate the quote, and create the order from that validated result.
+
+## Payment rule
+
+Stripe events must be verified with the webhook signature before changing order state. Webhook handlers should be idempotent so a retried event does not create duplicate fulfillment or state transitions.
+
+## Catalog rule
+
+Do not allow the DummyJSON identifier space and MongoDB identifier space to silently coexist in production checkout. A product shown in the storefront must resolve to the same identity used for quote, order, inventory, and payment.

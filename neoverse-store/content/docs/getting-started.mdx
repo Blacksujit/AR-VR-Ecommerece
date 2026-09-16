@@ -1,0 +1,95 @@
+---
+title: Getting started
+description: Run the storefront and Express API locally.
+icon: Rocket
+---
+
+# Getting started
+
+NeoVerse has two local processes:
+
+1. The Next.js storefront on `http://localhost:3000`.
+2. The Express API on `http://localhost:5000`.
+
+## Requirements
+
+- Node.js 20.9 or newer
+- npm
+- MongoDB for server-side commerce data
+- Firebase credentials for authenticated flows
+- Stripe credentials for payment testing
+
+## Install
+
+```bash
+cd neoverse-store
+npm install --legacy-peer-deps
+
+cd backend
+npm install
+```
+
+## Configure the storefront
+
+Create `neoverse-store/.env.local`:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+```
+
+## Configure the API
+
+Create `neoverse-store/backend/.env`:
+
+```bash
+NODE_ENV=development
+PORT=5000
+FRONTEND_URL=http://localhost:3000
+MONGODB_URI=mongodb://127.0.0.1:27017/neoverse
+FIREBASE_SERVICE_ACCOUNT_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+```
+
+Keep secrets in environment variables. Never commit service-account JSON, payment keys, webhook secrets, or provider keys.
+
+## Run
+
+Terminal one:
+
+```bash
+cd neoverse-store/backend
+npm run dev
+```
+
+Terminal two:
+
+```bash
+cd neoverse-store
+npm run dev
+```
+
+Then open [localhost:3000](http://localhost:3000). Check the API with [localhost:5000/api/health](http://localhost:5000/api/health).
+
+## Useful checks
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run react-doctor:design
+```

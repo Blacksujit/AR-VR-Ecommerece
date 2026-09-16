@@ -1,0 +1,41 @@
+---
+title: Deployment
+description: Deploy the storefront and API without losing their trust boundaries.
+icon: CloudUpload
+---
+
+# Deployment
+
+NeoVerse is designed as two deployable applications:
+
+- Next.js storefront on Vercel.
+- Express API on Render or another Node host.
+
+## Storefront
+
+```bash
+cd neoverse-store
+npm run build
+npx vercel deploy --prod --yes
+```
+
+Set `NEXT_PUBLIC_API_URL` in the Vercel production environment to the deployed API base URL, including `/api`.
+
+## API
+
+The API deployment is described in `backend/render.yaml`:
+
+- Root directory: `backend`
+- Build command: `npm install`
+- Start command: `npm start`
+
+Configure MongoDB, Firebase Admin, Stripe, AI providers, Cloudinary, email, and the allowed frontend origin in the host environment.
+
+## Verify
+
+```bash
+curl https://<api-host>/api/health
+curl -I https://neoverse.sujit.top/
+```
+
+Before enabling unrestricted commerce, verify that the storefront and API use the same product identifiers, prices, and stock records.

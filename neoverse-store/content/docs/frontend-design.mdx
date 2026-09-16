@@ -1,0 +1,58 @@
+---
+title: Frontend design guide
+description: The visual and component contract for thoughtful product inspection.
+icon: PanelsTopLeft
+---
+
+# Frontend design guide
+
+NeoVerse uses the visual language of an **instrumented atelier**: quiet enough to make the object legible, precise enough to expose evidence, and tactile enough to make inspection feel natural.
+
+The detailed implementation contract lives in [`docs/FRONTEND_DESIGN_SYSTEM.md`](https://github.com/your-org/neoverse-store/blob/main/docs/FRONTEND_DESIGN_SYSTEM.md).
+
+## Principles
+
+### Evidence before persuasion
+
+Show the object, useful facts, price, stock, and next action before promotional copy. A product card should remain useful with hover and motion disabled.
+
+### One surface, one job
+
+A route or component should have an observable customer job. Avoid adding visual treatment that does not improve understanding, comparison, inspection, or action.
+
+### Material, not “tech”
+
+Products are physical objects. Prefer graphite, paper, mineral panels, measurement marks, and gallery labels over neon, cyberpunk, or dashboard chrome.
+
+### Motion answers an action
+
+Animate opening, changing, loading, confirming, and transitioning. Respect `prefers-reduced-motion`; do not make every section float or reveal on scroll.
+
+## Core tokens
+
+- `ink` `#080B12` — page stage and deepest background
+- `panel` `#121922` — structural surfaces
+- `paper` `#F1EFE8` — headings and product facts
+- `muted` `#A3ACB8` — supporting copy
+- `electric` `#89A6FF` — action, focus, and inspection tools
+- `accent` `#C7ED70` — availability and confirmation
+- `warning` `#F2BE70` — pending attention
+- `error` `#FF8178` — failed or unavailable
+
+## Component contracts
+
+- **ProductCard:** image fallback, full name, current price, discount when real, rating when available, stock state, capability state, and one clear action.
+- **EvidenceRow:** a label/value fact with an explicit missing state; never invent data.
+- **Status:** text plus a marker or icon; color alone never carries meaning.
+- **ProductStage:** owns media, loading, failure, 3D controls, reduced motion, and unsupported-device states.
+- **PurchaseRail:** owns identity, price, stock, quote state, quantity, and the primary action.
+
+## Accessibility gates
+
+- Visible `:focus-visible` treatment.
+- Minimum 44px touch targets.
+- Keyboard support for navigation, filters, drawers, galleries, and checkout.
+- `aria-live` for cart and payment status changes.
+- Explicit alt text and meaningful media fallbacks.
+- Reserved image/model dimensions to reduce layout shift.
+- Immersive components loaded behind user intent where possible.

@@ -1,0 +1,14 @@
+{
+  "title": "NeoVerse",
+  "pages": [
+    "index",
+    "getting-started",
+    "product-architecture",
+    "frontend-design",
+    "commerce-api",
+    "immersive-inspection",
+    "security",
+    "deployment",
+    "contributing"
+  ]
+}
