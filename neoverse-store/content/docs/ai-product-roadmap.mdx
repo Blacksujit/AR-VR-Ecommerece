@@ -1,0 +1,166 @@
+---
+title: NeoVerse AI product roadmap
+description: A grounded implementation plan for useful, trustworthy shopping intelligence.
+icon: Sparkles
+---
+
+# NeoVerse AI product roadmap
+
+**Purpose:** define AI features that improve a real product decision without inventing product facts or replacing server-authoritative commerce.
+
+## Product standard
+
+An AI feature belongs in NeoVerse only when it helps a customer answer a buying question more clearly.
+
+Every AI response must:
+
+- Use current catalog data for product facts.
+- Show the products and fields used as evidence.
+- Say when the catalog does not contain an answer.
+- Never decide price, tax, shipping, stock, payment, or authorization.
+- Keep a useful non-AI path available.
+- Be measurable for relevance, grounding, latency, cost, and user feedback.
+
+## What is implemented now
+
+### Catalog-grounded assistant
+
+The assistant searches the current product catalog, gives the model only matched products, and validates recommendation identifiers before returning product cards.
+
+The UI now exposes real evidence when available:
+
+- Current price and original price
+- Availability
+- Rating
+- Category and brand
+- 3D, AR, and VR capability indicators
+- A link to inspect the product page
+
+It also provides quick prompts for common decisions without adding fake examples or placeholder products.
+
+## Priority 1: make the assistant trustworthy
+
+### 1. Evidence-backed answers
+
+Return a structured answer with:
+
+- A short response
+- Matched product IDs
+- Claims tied to product fields
+- Missing information
+- Suggested next action
+
+The UI should show an “Evidence from catalog” section under the answer rather than making the customer trust prose alone.
+
+### 2. Intent-aware catalog search
+
+Classify the request into a small set of intents:
+
+- Find products
+- Compare products
+- Explain a specification
+- Find within a budget
+- Find an inspection-capable product
+- Check availability
+- Unsupported request
+
+Use deterministic filters for price, rating, stock, category, and capabilities before calling the model. Use the model to explain the result, not to perform arithmetic or invent filters.
+
+### 3. Comparison mode
+
+When the user asks to compare products, render a compact comparison table with only fields present in the catalog. Missing values should read “Not provided,” never be guessed.
+
+### 4. Honest unavailable states
+
+If no provider is configured, show a clear disabled state and link back to catalog browsing. Do not present a fake AI answer.
+
+## Priority 2: improve decision support
+
+### 5. Preference refinement
+
+Ask one useful follow-up question when the request is underspecified:
+
+- What matters most: price, size, rating, material, or inspection capability?
+- What is the maximum budget?
+- Is the product for a particular space or use?
+
+Store preferences only with clear user consent.
+
+### 6. Explainable recommendations
+
+For every suggested product, show “Why this matches” using deterministic evidence such as:
+
+- Within budget
+- In stock
+- Higher rating
+- Supports AR or 3D
+- Matches category or search terms
+
+Do not use an opaque AI score as the primary explanation.
+
+### 7. Product-page assistant context
+
+When opened from a product page, let the assistant answer about that product first and compare it against nearby catalog alternatives. The product ID must come from the route, not from untrusted assistant text.
+
+### 8. Inspection guidance
+
+Let customers ask practical questions such as “Can I inspect this in AR?” or “What should I check before placing this in a small room?” Answers must reflect the product’s actual capability flags and available specifications.
+
+## Priority 3: production quality
+
+### 9. Streaming responses
+
+Stream assistant text after the server has completed retrieval and validation. Show retrieval and answer states separately so the customer knows whether the system is finding products or generating an explanation.
+
+### 10. Feedback and correction
+
+Add helpful/not-helpful controls and a “wrong product detail” report. Store aggregate quality signals without storing unnecessary personal data.
+
+### 11. Observability
+
+Track:
+
+- Request latency
+- Provider and model
+- Input/output tokens when available
+- Retrieval count
+- Recommendation click-through
+- Empty-result rate
+- User feedback
+- Provider failures and fallback rate
+
+Never log API keys, full payment data, or unrestricted private conversation content.
+
+### 12. Evaluation set
+
+Create a small versioned set of real catalog questions covering:
+
+- Budget filters
+- Availability
+- Capability checks
+- Comparisons
+- Missing specifications
+- No-match queries
+- Prompt injection attempts
+
+Evaluate groundedness, correct product linking, refusal behavior, and response usefulness before changing prompts or providers.
+
+## Features to avoid for now
+
+- Generic AI-generated product descriptions without editorial review
+- AI-generated reviews or ratings
+- Fake “personalized” recommendations without preference data
+- Autonomous cart or checkout changes
+- AI-set prices, discounts, inventory, tax, or shipping
+- Open web recommendations mixed with the store catalog without clear source labels
+- Vector search before deterministic catalog search and evaluation are working
+- Multi-agent orchestration without a measured workflow that needs it
+
+## Suggested implementation order
+
+1. Evidence-backed response schema.
+2. Deterministic intent filters and comparison mode.
+3. Product-page context.
+4. Feedback and evaluation dataset.
+5. Streaming and observability.
+6. Embeddings or hybrid retrieval only after catalog quality and query logs justify it.

@@ -16,8 +16,19 @@ interface ChatMessage {
     slug: string
     price: number
     discount: number
+    originalPrice?: number
+    currentPrice?: number
     images: string[]
     rating: number
+    stock?: number
+    availability?: string
+    brand?: string
+    capabilities?: {
+      model3d?: boolean
+      ar?: boolean
+      vr?: boolean
+    }
+    specifications?: Array<{ name?: string; value?: string }>
     recommended?: boolean
   }>
 }
@@ -32,6 +43,12 @@ export default function AIChatBot() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [lastIntent, setLastIntent] = useState<string | null>(null)
+  const quickPrompts = [
+    'Compare the best available options',
+    'What is the best value under $100?',
+    'Which products support 3D or AR inspection?',
+  ]
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { isCartOpen } = useUIStore()
@@ -51,21 +68,21 @@ export default function AIChatBot() {
     if (!isCartOpen) setIsOpen(true)
   }
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return
-    const userMessage = input.trim()
+  const sendMessage = async (userMessage: string) => {
+    if (!userMessage.trim() || isLoading) return
     setInput('')
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
     try {
-      const res = await api.post<{ success: boolean; data: { response: string; products?: ChatMessage['products'] } }>(
+      const res = await api.post<{ success: boolean; data: { response: string; intent?: { intent?: string }; products?: ChatMessage['products'] } }>(
         '/ai/chat',
         {
           message: userMessage,
           history: messages.slice(-8).map(({ role, content }) => ({ role, content })),
         }
       )
+      setLastIntent(res.data.intent?.intent || null)
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: res.data.response, products: res.data.products },
@@ -78,6 +95,11 @@ export default function AIChatBot() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return
+    await sendMessage(input.trim())
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -150,10 +172,24 @@ export default function AIChatBot() {
                               <a
                                 key={p._id}
                                 href={`/products/${p.slug}`}
-                                className="block rounded-control border border-line bg-panel-soft p-2 transition-colors hover:border-electric/60"
+                                className="block rounded-control border border-line bg-panel-soft p-3 transition-colors hover:border-electric/60"
                               >
-                                <p className="text-xs font-medium text-paper">{p.name}</p>
-                                <p className="text-xs text-electric">${p.price.toFixed(2)}{p.recommended ? ' · Suggested match' : ''}</p>
+                                <div className="flex items-start justify-between gap-3">
+                                  <p className="text-xs font-medium text-paper">{p.name}</p>
+                                  {p.recommended && <span className="shrink-0 text-[10px] text-accent">Match</span>}
+                                </div>
+                                <p className="mt-1 text-xs text-electric">
+                                  ${(p.currentPrice ?? p.price).toFixed(2)}
+                                  {p.originalPrice && p.originalPrice > (p.currentPrice ?? p.price) && (
+                                    <span className="ml-1 text-faint line-through">${p.originalPrice.toFixed(2)}</span>
+                                  )}
+                                </p>
+                                <p className="mt-1 text-[11px] text-muted">
+                                  {p.availability || 'Availability not provided'} · {p.rating ? `${p.rating}/5 rating` : 'Rating not provided'}
+                                </p>
+                                {(p.capabilities?.model3d || p.capabilities?.ar || p.capabilities?.vr) && (
+                                  <p className="mt-1 text-[11px] text-electric-strong">Inspection: {[p.capabilities.model3d && '3D', p.capabilities.ar && 'AR', p.capabilities.vr && 'VR'].filter(Boolean).join(' · ')}</p>
+                                )}
                               </a>
                             ))}
                           </div>
@@ -163,6 +199,23 @@ export default function AIChatBot() {
                   </div>
                 </div>
               ))}
+              {messages.length === 1 && !isLoading && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {quickPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => sendMessage(prompt)}
+                      className="rounded-full border border-line bg-panel-soft px-3 py-2 text-left text-[11px] text-muted transition-colors hover:border-electric/60 hover:text-paper"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {lastIntent && !isLoading && (
+                <p className="text-[10px] text-faint">Using catalog filter: {lastIntent}</p>
+              )}
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl px-4 py-2.5 bg-white/5">

@@ -69,10 +69,32 @@ const queryGemini = async (messages) => {
   return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
 };
 
+const extractIntent = (query) => {
+  const normalized = query.toLowerCase();
+  const priceMatch = query.match(/(?:under|below|less than|max(?:imum)?(?: budget)?(?: of)?)\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
+  const minRatingMatch = query.match(/(\d+(?:\.\d+)?)\s*star/i);
+  const wantsInspection = /\b(3d|ar|augmented reality|vr|virtual reality|inspect|place in|room|space)\b/i.test(normalized);
+  const wantsComparison = /\b(compare|comparison|versus|vs\.?|difference|which one|better)\b/i.test(normalized);
+  const wantsAvailability = /\b(in stock|available|availability|ready to ship)\b/i.test(normalized);
+  const intent = wantsComparison ? 'compare'
+    : wantsInspection ? 'inspection'
+      : wantsAvailability ? 'availability'
+        : priceMatch ? 'budget'
+          : 'discover';
+
+  return {
+    intent,
+    maxPrice: priceMatch ? Number(priceMatch[1].replace(/,/g, '')) : null,
+    minRating: minRatingMatch ? Number(minRatingMatch[1]) : null,
+    wantsInspection,
+    wantsComparison,
+    wantsAvailability,
+  };
+};
+
 const buildProductContext = async (query) => {
-  const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 2);
-  const priceMatch = query.match(/under\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
-  const minRatingMatch = query.match(/(\d+)\s*star/i);
+  const intent = extractIntent(query);
+  const searchTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2 && !['under', 'below', 'best', 'with', 'that', 'this', 'what', 'which'].includes(t));
 
   const dbQuery = {};
   if (searchTerms.length > 0) {
@@ -83,20 +105,36 @@ const buildProductContext = async (query) => {
       { category: { $regex: searchTerms.join('|'), $options: 'i' } },
     ];
   }
-  if (priceMatch) {
-    const maxPrice = parseInt(priceMatch[1].replace(/,/g, ''));
-    dbQuery.price = { ...dbQuery.price, $lte: maxPrice };
+  if (intent.maxPrice !== null) {
+    dbQuery.price = { ...dbQuery.price, $lte: intent.maxPrice };
   }
-  if (minRatingMatch) {
-    dbQuery.rating = { $gte: parseInt(minRatingMatch[1]) };
+  if (intent.minRating !== null) {
+    dbQuery.rating = { $gte: intent.minRating };
+  }
+  if (intent.wantsAvailability) {
+    dbQuery.stock = { $gt: 0 };
+  }
+  if (intent.wantsInspection) {
+    const inspectionQuery = [
+      { modelUrl: { $exists: true, $ne: '' } },
+      { isARSupported: true },
+      { isVRSupported: true },
+    ];
+    if (dbQuery.$or) {
+      dbQuery.$and = [{ $or: dbQuery.$or }, { $or: inspectionQuery }];
+      delete dbQuery.$or;
+    } else {
+      dbQuery.$or = inspectionQuery;
+    }
   }
 
   const products = await Product.find(dbQuery)
-    .select('name slug price description rating category tags images discount stock brand')
+    .select('name slug price description rating category tags images discount stock brand modelUrl isARSupported isVRSupported specifications')
+    .sort({ stock: -1, rating: -1 })
     .limit(20)
     .lean();
 
-  return products;
+  return { products, intent };
 };
 
 const chat = async (req, res, next) => {
@@ -117,7 +155,7 @@ const chat = async (req, res, next) => {
       });
     }
 
-    const products = await buildProductContext(message);
+    const { products, intent } = await buildProductContext(message);
     const productCatalog = products.length > 0
       ? products.map(p =>
           `- ${p.name} ($${p.discount > 0 ? (p.price * (1 - p.discount / 100)).toFixed(2) : p.price.toFixed(2)}): ${p.description?.substring(0, 150)} | Rating: ${p.rating}/5 | Category: ${p.category}${p.discount > 0 ? ` | ${p.discount}% OFF!` : ''}`
@@ -140,7 +178,11 @@ RULES:
 - For gift recommendations, consider the recipient's interests.
 - For specification explanations, use simple analogies.
 - When summarizing reviews, be balanced.
-- Suggest accessories when relevant.`;
+- Suggest accessories when relevant.
+- The current deterministic query intent is ${intent.intent}. Treat its filters as authoritative.
+- If the user asks for a comparison, compare only the returned catalog products.
+- If a field is absent, say it is not provided.
+- Do not claim that a product matches a preference unless the catalog evidence supports it.`;
 
     const chatHistory = (history || []).map(h => ({
       role: h.role,
@@ -177,15 +219,41 @@ RULES:
       success: true,
       data: {
         response,
+        intent,
+        evidence: products.map(p => ({
+          productId: p._id,
+          fields: {
+            price: Number((p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price).toFixed(2)),
+            availability: p.stock > 0 ? 'Available' : 'Out of stock',
+            rating: p.rating,
+            category: p.category,
+            capabilities: {
+              model3d: Boolean(p.modelUrl),
+              ar: Boolean(p.isARSupported),
+              vr: Boolean(p.isVRSupported),
+            },
+          },
+        })),
         products: products.map(p => ({
           _id: p._id,
           name: p.name,
           slug: p.slug,
           price: p.price,
           discount: p.discount,
+          originalPrice: p.price,
+          currentPrice: Number((p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price).toFixed(2)),
           images: p.images,
           rating: p.rating,
+          stock: p.stock,
+          availability: p.stock > 0 ? 'Available' : 'Out of stock',
           category: p.category,
+          brand: p.brand,
+          capabilities: {
+            model3d: Boolean(p.modelUrl),
+            ar: Boolean(p.isARSupported),
+            vr: Boolean(p.isVRSupported),
+          },
+          specifications: (p.specifications || []).slice(0, 6),
           recommended: recommendationIdSet.has(p._id.toString()),
         })),
         provider: model,
@@ -210,20 +278,28 @@ const search = async (req, res, next) => {
       return next(new AppError('Search query is required', 400));
     }
 
-    const products = await buildProductContext(q);
+    const { products, intent } = await buildProductContext(q);
 
     res.json({
       success: true,
-      data: products.map(p => ({
-        _id: p._id,
-        name: p.name,
-        slug: p.slug,
-        price: p.price,
-        discount: p.discount,
-        images: p.images,
-        rating: p.rating,
-        category: p.category,
-      })),
+      data: {
+        intent,
+        products: products.map(p => ({
+          _id: p._id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price,
+          discount: p.discount,
+          originalPrice: p.price,
+          currentPrice: Number((p.discount > 0 ? p.price * (1 - p.discount / 100) : p.price).toFixed(2)),
+          images: p.images,
+          rating: p.rating,
+          stock: p.stock,
+          availability: p.stock > 0 ? 'Available' : 'Out of stock',
+          category: p.category,
+          brand: p.brand,
+        })),
+      },
     });
   } catch (error) {
     next(error);
