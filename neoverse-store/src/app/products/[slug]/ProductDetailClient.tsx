@@ -164,6 +164,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
   const gradient = getGradient(product.category)
   const badge = getBadge(product)
+  const hasVerified3D = !!product.modelUrl && /^https:\/\//i.test(product.modelUrl) && /\.(glb|gltf)(?:[?#].*)?$/i.test(product.modelUrl)
+  const hasVerifiedAR = hasVerified3D && product.isARSupported === true
   const inWishlist = isInWishlist(product._id)
 
   const gradientVariants = [
@@ -208,8 +210,8 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               ))}
             </div>
             <div className="absolute top-4 right-4 flex gap-2">
-              {product.isARSupported && <Badge variant="primary">AR</Badge>}
-              {product.isVRSupported && <Badge variant="primary">VR</Badge>}
+              {hasVerifiedAR && <Badge variant="primary">AR</Badge>}
+              {hasVerified3D && product.isVRSupported === true && <Badge variant="primary">VR</Badge>}
             </div>
           </ProductGallery>
 
@@ -248,9 +250,20 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <ScrollReveal delay={0.2}>
               <Card variant="glass" className="p-6 sm:p-8 sticky top-28" ref={viewerRef}>
                 <h3 className="text-lg font-semibold text-white mb-4">3D View</h3>
-                <ProductViewer modelUrl={product.modelUrl} productName={product.name} />
+                <ProductViewer
+                  modelUrl={product.modelUrl}
+                  productName={product.name}
+                  imageUrl={product.images?.[0]}
+                  specifications={product.specifications}
+                />
                 <div className="mt-4">
-                  <ARViewer modelUrl={product.modelUrl} productName={product.name} poster={product.images?.[0]} />
+                  <ARViewer
+                    modelUrl={product.modelUrl}
+                    modelUsdzUrl={product.modelUsdzUrl}
+                    productName={product.name}
+                    poster={product.images?.[0]}
+                    arSupported={hasVerifiedAR}
+                  />
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-sm text-white/40">
                   <Clock className="w-4 h-4" />

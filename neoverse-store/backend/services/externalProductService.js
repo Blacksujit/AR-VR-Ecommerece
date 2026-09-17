@@ -42,7 +42,8 @@ const syncProductsAndCategories = async () => {
   console.log(`Synced ${categories.length} categories`);
 
   const products = productRes.products.map((p) => {
-    const numReviews = p.reviews ? p.reviews.length : Math.floor(Math.random() * 500) + 5;
+    // Preserve only the provider's actual review count. Never invent social proof.
+    const numReviews = Array.isArray(p.reviews) ? p.reviews.length : 0;
     return {
       name: p.title,
       slug: slugify(p.title) + '-' + p.id,
@@ -61,8 +62,11 @@ const syncProductsAndCategories = async () => {
       ],
       rating: p.rating || 0,
       numReviews,
-      isARSupported: (p.rating || 0) >= 4.0,
-      isVRSupported: (p.rating || 0) >= 4.5,
+      // Immersive capabilities are opt-in metadata. A rating cannot prove
+      // that a product has a real, compatible 3D asset or scene.
+      modelUrl: null,
+      isARSupported: false,
+      isVRSupported: false,
       aiScore: +((p.rating || 0) * 2).toFixed(1),
       featured: (p.rating || 0) >= 4.5,
       trending: (p.rating || 0) >= 4.0 && (p.stock || 0) > 30,

@@ -47,6 +47,17 @@ const productSchema = mongoose.Schema(
     images: [String],
     modelUrl: {
       type: String,
+      validate: {
+        validator: (value) => !value || /^https:\/\//i.test(value),
+        message: '3D model URL must use HTTPS',
+      },
+    },
+    modelUsdzUrl: {
+      type: String,
+      validate: {
+        validator: (value) => !value || (/^https:\/\//i.test(value) && /\.usdz(?:[?#].*)?$/i.test(value)),
+        message: 'USDZ model URL must be an HTTPS .usdz asset',
+      },
     },
     specifications: [specificationSchema],
     rating: {
