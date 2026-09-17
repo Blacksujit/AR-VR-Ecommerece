@@ -8,11 +8,11 @@ const seed = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    console.log('Fetching real products from DummyJSON...');
+    console.log('Fetching real catalog products...');
     const result = await syncProductsAndCategories();
 
-    console.log(`Seeded ${result.products} products from DummyJSON`);
-    console.log(`Seeded ${result.categories} categories from DummyJSON`);
+    console.log(`Seeded ${result.products} products with provider media`);
+    console.log(`Seeded ${result.categories} catalog categories`);
 
     process.exit(0);
   } catch (error) {

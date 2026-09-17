@@ -84,7 +84,7 @@ export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
                           -{product.discount}%
                         </span>
                       )}
-                      {product.isVRSupported && (
+                      {product.isVRSupported && product.modelUrl && (
                         <span className="absolute right-3 top-3 z-10 rounded-md bg-accent px-2 py-1 text-xs font-semibold text-ink">
                           3D
                         </span>
@@ -129,7 +129,7 @@ export function FeaturedProducts({ initialData }: FeaturedProductsProps) {
                         onClick={() => addToCart(product as unknown as Product)}
                       >
                         <ShoppingBag className="w-3 h-3 mr-1" />
-                        Add to Cart
+                        Add to cart
                       </Button>
                     </div>
                   </div>

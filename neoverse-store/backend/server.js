@@ -46,8 +46,27 @@ const strictLimiter = rateLimit({
 const paidApiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
-  message: { success: false, message: 'API rate limit exceeded. Try again shortly.' },
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { success: false, code: 'API_RATE_LIMITED', message: 'API rate limit exceeded. Try again shortly.' },
 });
+
+const aiConcurrency = new Set();
+const aiRequestGuard = (req, res, next) => {
+  const identity = req.auth?.userId || req.ip;
+  if (aiConcurrency.has(identity)) {
+    return res.status(429).json({
+      success: false,
+      code: 'AI_REQUEST_IN_PROGRESS',
+      message: 'Your previous assistant request is still being processed. Please wait a moment.',
+      retryAfterSeconds: 2,
+    });
+  }
+
+  aiConcurrency.add(identity);
+  res.on('finish', () => aiConcurrency.delete(identity));
+  next();
+};
 
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -76,7 +95,7 @@ app.use(cors({
 app.use(morgan('dev'));
 
 // Paid API limiters (applied before general limiter, so specific limits win)
-app.use('/api/ai', paidApiLimiter);
+app.use('/api/ai', paidApiLimiter, aiRequestGuard);
 app.use('/api/upload', uploadLimiter);
 app.use('/api/email', strictLimiter);
 app.use('/api/stripe/checkout', paidApiLimiter);
@@ -140,8 +159,19 @@ mongoose
     } else {
       console.log(`Database has ${count} products — skipping sync`);
     }
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    });
+
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Stop the existing backend process or run this server with a different PORT.`);
+        process.exitCode = 1;
+        return;
+      }
+
+      console.error('Server failed to start:', error.message);
+      process.exitCode = 1;
     });
   })
   .catch((err) => {

@@ -23,7 +23,7 @@ export function HeroSection() {
   return (
     <section ref={ref} className="relative overflow-hidden border-b border-line">
 
-      <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-12 px-6 py-20 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:px-10 lg:py-24">
+      <div className="relative mx-auto grid min-h-[calc(100dvh-4rem)] max-w-7xl items-center gap-12 px-6 py-16 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:px-10 lg:py-20">
         <motion.div style={{ y, opacity }} className="max-w-2xl">
         <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -38,7 +38,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.08, ease: easeOut }}
-            className="max-w-xl text-balance font-display text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-paper sm:text-6xl lg:text-7xl"
+            className="max-w-xl text-balance font-display text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-paper sm:text-6xl lg:text-6xl xl:text-7xl"
           >
             Make the decision before the delivery.
           </motion.h1>
@@ -48,7 +48,7 @@ export function HeroSection() {
             transition={{ duration: 0.65, delay: 0.16, ease: easeOut }}
             className="mt-7 max-w-lg text-lg leading-relaxed text-muted"
           >
-            Compare the details that matter, inspect supported products in 3D, and move to checkout with fewer unanswered questions.
+            Compare useful details, inspect supported products in 3D, and reach checkout with fewer unanswered questions.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -72,7 +72,7 @@ export function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.65, delay: 0.4, ease: easeOut }}
-            className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted"
+            className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted"
           >
             <span className="flex items-center gap-2"><Check className="h-4 w-4 text-accent" /> Price and stock shown clearly</span>
             <span className="flex items-center gap-2"><Rotate3D className="h-4 w-4 text-electric" /> 3D tools where supported</span>

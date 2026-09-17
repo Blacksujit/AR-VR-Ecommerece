@@ -75,22 +75,31 @@ export default function AIChatBot() {
     setIsLoading(true)
 
     try {
-      const res = await api.post<{ success: boolean; data: { response: string; intent?: { intent?: string }; products?: ChatMessage['products'] } }>(
+      const res = await api.postAnonymous<{ success: boolean; data: { response: string; intent?: { intent?: string }; products?: ChatMessage['products'] }; message?: string; code?: string }>(
         '/ai/chat',
         {
           message: userMessage,
           history: messages.slice(-8).map(({ role, content }) => ({ role, content })),
-        }
+        },
+        45000
       )
       setLastIntent(res.data.intent?.intent || null)
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: res.data.response, products: res.data.products },
       ])
-    } catch {
+    } catch (error) {
+      const errorWithCode = error as Error & { status?: number; code?: string }
+      const errorMessage = error instanceof Error ? error.message : 'The assistant could not complete that request.'
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: "Sorry, I couldn't process your request. Please try again or contact support." },
+        { role: 'assistant', content: errorWithCode.code === 'AI_RATE_LIMITED' || errorMessage.includes('rate limit')
+          ? 'The assistant is temporarily rate-limited. Please wait about a minute and try again.'
+          : errorWithCode.code === 'AI_REQUEST_IN_PROGRESS' || errorMessage.includes('still being processed')
+            ? 'Your previous question is still being processed. Please wait a moment.'
+            : errorWithCode.code === 'AI_PROVIDER_ERROR'
+              ? 'The AI provider is temporarily unavailable. Please try again shortly; the catalog is still available for manual browsing.'
+              : 'The assistant is temporarily unavailable. You can still browse the catalog and compare products manually.' },
       ])
     } finally {
       setIsLoading(false)

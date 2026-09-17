@@ -103,6 +103,7 @@ Desktop uses an asymmetric 7/5 split: the product stage earns more space than th
 Rules:
 
 - No decorative gradients behind text.
+- No React Bits or animated component is added for novelty. A component must improve product discovery, inspection, comparison, or feedback. The React Bits registry may be used for a restrained state transition or gallery interaction after the component is reviewed for bundle size, keyboard behavior, and reduced motion.
 - Electric is reserved for things the customer can act on or focus.
 - Lime is a confirmation signal, not a secondary brand color.
 - Color never carries state alone; pair it with text, iconography, or structure.
@@ -110,7 +111,7 @@ Rules:
 ### Typography
 
 - **Space Grotesk:** wordmark, page titles, hero claims, and major object names.
-- **Inter:** navigation, body copy, forms, buttons, metadata, prices, and operational screens.
+- **Inter:** navigation, body copy, forms, buttons, metadata, prices, and operational screens. This is an intentional neutral interface choice for a trust-first commerce product, not decorative typography.
 - Use sentence case.
 - Do not use decorative monospace labels.
 - Keep body line length between 45 and 78 characters.
@@ -144,6 +145,8 @@ Primary actions use electric fill without a permanent glow. Secondary actions us
 ### `Surface`
 
 A surface provides structural separation, not decoration. Default surface: `panel` background, one-pixel `line` border, `surface` radius, no shadow. Elevation is reserved for drawers, menus, dialogs, and a purchase rail when necessary.
+
+React Bits is configured as an optional component registry in `components.json`. Use it only when a reviewed component improves discovery, inspection, comparison, or feedback. Do not add animated backgrounds, decorative particles, or perpetual motion to transactional surfaces. Any adopted component must preserve keyboard access, reduced-motion behavior, the NeoVerse token palette, and the existing bundle budget.
 
 ### `EvidenceRow`
 

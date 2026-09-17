@@ -15,6 +15,7 @@ import { useAuth } from '@/components/auth/AuthContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
   const { user, logout } = useAuth()
@@ -25,6 +26,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
+    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -133,18 +135,25 @@ export default function Navbar() {
             </Link>
 
             {user ? (
-              <div className="relative group">
+              <div className="relative">
                 <button
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-electric/30 bg-electric/10 text-sm font-semibold text-electric hover:bg-electric/20 transition-colors"
-                  aria-label="User menu"
+                  onClick={() => setUserMenuOpen((open) => !open)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-electric/30 bg-electric/10 text-sm font-semibold text-electric transition-colors hover:bg-electric/20"
+                  aria-label="Open account menu"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="menu"
                 >
                   {getInitials(user.name)}
                 </button>
-                <div className="invisible absolute right-0 top-full mt-2 w-48 translate-y-1 rounded-control border border-line bg-panel/95 opacity-0 shadow-elevated backdrop-blur-xl transition-[opacity,transform,visibility] duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                <div className={cn(
+                  'absolute right-0 top-full mt-2 w-48 rounded-control border border-line bg-panel shadow-elevated transition-[opacity,transform,visibility] duration-200',
+                  userMenuOpen ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'
+                )} role="menu">
                   <div className="py-2">
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-glass-hover transition-colors"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-foreground/80 transition-colors hover:bg-panel-soft hover:text-foreground"
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
@@ -152,7 +161,8 @@ export default function Navbar() {
                     {user.role === 'admin' && (
                       <Link
                         href="/admin"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/80 hover:text-foreground hover:bg-glass-hover transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-foreground/80 transition-colors hover:bg-panel-soft hover:text-foreground"
                       >
                         <Shield className="h-4 w-4" />
                         Admin
@@ -161,7 +171,7 @@ export default function Navbar() {
                     <hr className="my-1 border-glass-border" />
                     <button
                       onClick={logout}
-                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-error/80 hover:text-error hover:bg-error/5 transition-colors"
+                      className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-sm text-error/80 transition-colors hover:bg-error/5 hover:text-error"
                     >
                       <LogOut className="h-4 w-4" />
                       Logout
@@ -172,10 +182,10 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => setShowRegister(true)}>
-                  Get Started
+                  Create account
                 </Button>
                 <Button size="sm" onClick={() => setShowLogin(true)}>
-                  Sign In
+                  Sign in
                 </Button>
               </div>
             )}
@@ -247,15 +257,15 @@ export default function Navbar() {
                 <div className="flex flex-col gap-2 pt-2">
                   <button
                     onClick={() => { toggleMobileMenu(); setShowLogin(true) }}
-                    className="w-full px-4 py-3 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-xl transition-colors"
+                    className="min-h-11 w-full rounded-control bg-primary px-4 py-3 text-sm font-medium text-ink transition-colors hover:bg-primary-light"
                   >
-                    Sign In
+                    Sign in
                   </button>
                   <button
                     onClick={() => { toggleMobileMenu(); setShowRegister(true) }}
-                    className="w-full px-4 py-3 text-sm font-medium text-foreground border border-glass-border hover:bg-glass-hover rounded-xl transition-colors"
+                    className="min-h-11 w-full rounded-control border border-line px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-panel-soft"
                   >
-                    Get Started
+                    Create account
                   </button>
                 </div>
               )}

@@ -18,11 +18,18 @@ const fetchJson = (url) => new Promise((resolve, reject) => {
 const slugify = (text) =>
   text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+const normalizeImageUrls = (...sources) => Array.from(new Set(
+  sources
+    .flatMap((source) => Array.isArray(source) ? source : [source])
+    .map((value) => typeof value === 'string' ? value.trim() : '')
+    .filter((value) => /^https:\/\//i.test(value))
+));
+
 const syncProductsAndCategories = async () => {
-  console.log('Fetching products from DummyJSON...');
+  console.log('Fetching catalog products from the configured provider...');
   const productRes = await fetchJson(`${API_BASE}/products?limit=200`);
 
-  console.log('Fetching categories from DummyJSON...');
+  console.log('Fetching catalog categories from the configured provider...');
   const categoriesData = await fetchJson(`${API_BASE}/products/categories`);
 
   const now = new Date();
@@ -53,7 +60,10 @@ const syncProductsAndCategories = async () => {
       price: p.price,
       discount: Math.round(p.discountPercentage || 0),
       stock: p.stock || 0,
-      images: [p.thumbnail, ...(p.images || [])],
+      // Only persist provider-owned HTTPS media. Local paths are invalid here
+      // because the sync service cannot guarantee that a matching public asset
+      // exists in the storefront deployment.
+      images: normalizeImageUrls(p.thumbnail, p.images),
       specifications: [
         { key: 'Weight', value: p.weight ? `${p.weight}g` : 'N/A' },
         { key: 'SKU', value: p.sku || 'N/A' },

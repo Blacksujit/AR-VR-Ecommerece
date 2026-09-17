@@ -83,7 +83,7 @@ const answerShoppingQuestion = async ({ message, history = [], products }) => {
     : [];
 
   const response = await anthropic.messages.create({
-    model: process.env.ANTHROPIC_MODEL || 'claude-opus-5',
+    model: process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-latest',
     max_tokens: 1200,
     thinking: { type: 'adaptive' },
     system,

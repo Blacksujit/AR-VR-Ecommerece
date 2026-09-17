@@ -41,9 +41,10 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
 
-  const discountBadgeText =
-    product.discount > 20 ? 'Hot Deal' :
-    product.discount > 0 ? `-${product.discount}%` : null
+  const discountBadgeText = product.discount > 0 ? `-${product.discount}%` : null
+  const hasVerified3D = !!product.modelUrl && /^https:\/\//i.test(product.modelUrl) && /\.(glb|gltf)(?:[?#].*)?$/i.test(product.modelUrl)
+  const hasVerifiedAR = hasVerified3D && product.isARSupported === true
+  const hasVerifiedVR = hasVerified3D && product.isVRSupported === true
 
   return (
     <div>
@@ -54,17 +55,20 @@ export function ProductInfo({
         </h1>
       </div>
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex items-center gap-1.5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn('h-5 w-5', i < Math.floor(product.rating) ? 'fill-warning text-warning' : 'text-muted/30')}
-            />
-          ))}
+      {product.rating > 0 || product.numReviews > 0 ? (
+        <div className="mb-6 flex items-center gap-4">
+          <div className="flex items-center gap-1.5" aria-label={`Rated ${product.rating.toFixed(1)} out of 5`}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                className={cn('h-5 w-5', i < Math.floor(product.rating) ? 'fill-warning text-warning' : 'text-muted/30')}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+          <span className="text-sm text-muted">{product.rating > 0 ? product.rating.toFixed(1) : 'Rating unavailable'} ({product.numReviews} reviews)</span>
         </div>
-        <span className="text-sm text-muted">{product.rating > 0 ? product.rating.toFixed(1) : 'New'} ({product.numReviews} reviews)</span>
-      </div>
+      ) : null}
 
       <div className="flex items-baseline gap-3 mb-8">
         <span className="text-4xl font-semibold tabular-nums text-paper">{formatPrice(discountedPrice)}</span>
@@ -110,7 +114,7 @@ export function ProductInfo({
 
           <Button variant="primary" size="lg" className="w-full flex-1 sm:w-auto group" onClick={onAddToCart} disabled={product.stock < 1}>
             <ShoppingCart className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
-            Add to Cart - {formatPrice(discountedPrice * quantity)}
+            Add to bag · {formatPrice(discountedPrice * quantity)}
           </Button>
 
           <button
@@ -129,15 +133,15 @@ export function ProductInfo({
           </button>
         </div>
 
-        {(product.isARSupported || product.isVRSupported) && (
+        {(hasVerifiedAR || hasVerifiedVR) && (
           <div className="mt-4 flex flex-wrap gap-3 border-t border-line pt-4">
-            {product.isARSupported && (
+            {hasVerifiedAR && (
               <Button variant="outline" onClick={onViewAR}>
                 <Eye className="w-4 h-4" />
                 View in AR
               </Button>
             )}
-            {product.isVRSupported && (
+            {hasVerifiedVR && (
               <Button variant="secondary" onClick={() => window.open('/vr-showroom', '_blank')}>
                 <Box className="w-4 h-4" />
                 View in VR Showroom
@@ -147,13 +151,13 @@ export function ProductInfo({
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-surface border border-line bg-line sm:grid-cols-3">
         {[
-          { icon: Truck, label: 'Free Shipping', sub: 'On orders over $50' },
-          { icon: Shield, label: '2 Year Warranty', sub: 'Full coverage' },
-          { icon: RotateCcw, label: '30 Days Return', sub: 'No questions asked' },
+          { icon: Truck, label: 'Shipping', sub: 'Shown at checkout' },
+          { icon: Shield, label: 'Product support', sub: 'Details in the listing' },
+          { icon: RotateCcw, label: 'Returns', sub: 'See the store policy' },
         ].map((item) => (
-          <div key={item.label} className="rounded-control border border-line bg-panel p-4 text-center">
+          <div key={item.label} className="bg-panel p-4 text-center">
             <item.icon className="mx-auto mb-2 h-5 w-5 text-electric" />
             <p className="text-sm font-medium text-paper">{item.label}</p>
             <p className="mt-0.5 text-xs text-muted">{item.sub}</p>

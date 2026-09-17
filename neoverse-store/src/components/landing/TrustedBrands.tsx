@@ -1,70 +1,45 @@
 'use client'
 
-import { Smartphone, Globe, Box, Headphones, Monitor, Cpu, ScanLine, CuboidIcon as Cube } from 'lucide-react'
+import { Box, Camera, Globe, Monitor, Smartphone } from 'lucide-react'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 
-const ecosystems = [
-  { icon: Smartphone, name: 'Apple Quick Look', desc: 'AR Quick Look on iOS', platform: 'iOS AR' },
-  { icon: Globe, name: 'WebXR', desc: 'Browser-based AR/VR', platform: 'Cross-Platform' },
-  { icon: Box, name: 'Google ARCore', desc: 'Android AR experiences', platform: 'Android' },
-  { icon: Headphones, name: 'Meta Quest Browser', desc: 'VR showroom compatible', platform: 'VR' },
-  { icon: Monitor, name: 'Desktop WebGL', desc: '3D preview without headset', platform: 'Desktop' },
-  { icon: Cpu, name: 'Android Scene Viewer', desc: 'GLB model viewing', platform: 'Android' },
-  { icon: ScanLine, name: 'USDZ / GLB', desc: 'Industry-standard 3D formats', platform: 'Standard' },
-  { icon: Cube, name: 'Three.js', desc: 'Web-based 3D rendering', platform: 'Web' },
+const capabilities = [
+  { icon: Smartphone, name: 'Mobile inspection', description: 'Review the product from the device already in your hand.' },
+  { icon: Camera, name: 'Real product media', description: 'See the images and specifications attached to the catalog record.' },
+  { icon: Box, name: 'Verified 3D assets', description: '3D controls appear only when a product has a real model asset.' },
+  { icon: Globe, name: 'Browser-first access', description: 'Browse the experience without requiring a separate app.' },
+  { icon: Monitor, name: 'Desktop viewing', description: 'Inspect product details comfortably on a larger screen.' },
 ]
 
 export function TrustedBrands() {
   return (
-    <section className="relative border-b border-line py-20 sm:py-28 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+    <section className="border-b border-line py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <ScrollReveal>
-          <div className="text-center">
-            <p className="mb-3 text-sm font-medium text-electric">Built for the way people already browse</p>
-            <h2 className="text-3xl font-display font-semibold tracking-tight text-paper sm:text-4xl lg:text-5xl">
-              Open formats. More ways to see.
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <h2 className="max-w-md font-display text-2xl font-medium tracking-tight text-paper sm:text-3xl">
+              The interface adapts to the evidence available.
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
-              NeoVerse AR and 3D experiences are built on open, industry-standard
-              formats — no app download required, no proprietary lock-in.
+            <p className="max-w-xl text-sm leading-6 text-muted">
+              A product with a verified 3D asset can offer deeper inspection. A product without one still gets a useful page with honest images, specifications, price, and availability.
             </p>
           </div>
         </ScrollReveal>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            {ecosystems.map((item) => {
-              const Icon = item.icon
-              return (
-                <div
-                  key={item.name}
-                  className="group rounded-control border border-line bg-panel p-4 text-center transition-[border-color,box-shadow] duration-200 hover:border-electric/40 hover:shadow-soft sm:p-5"
-                >
-                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-control border border-line bg-panel-soft transition-colors group-hover:bg-electric/10">
-                    <Icon className="h-5 w-5 text-electric" />
-                  </div>
-                  <p className="mb-1 text-sm font-semibold text-paper">{item.name}</p>
-                  <p className="text-xs text-muted">{item.desc}</p>
-                  <span className="mt-2 inline-block text-[10px] font-medium text-electric/80">
-                    {item.platform}
-                  </span>
+        <div className="mt-12 grid gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-5">
+          {capabilities.map((item, index) => {
+            const Icon = item.icon
+            return (
+              <ScrollReveal key={item.name} delay={index * 0.06} direction="up">
+                <div className="h-full bg-ink p-5 sm:p-6">
+                  <Icon className="h-5 w-5 text-electric" aria-hidden="true" />
+                  <h3 className="mt-8 text-sm font-medium text-paper">{item.name}</h3>
+                  <p className="mt-2 text-xs leading-5 text-muted">{item.description}</p>
                 </div>
-              )
-            })}
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.2}>
-          <div className="mt-12 text-center">
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted">
-              No special hardware required. All AR experiences work through your
-              mobile browser. VR Showroom is accessible from any desktop or
-              VR-capable browser.
-            </p>
-          </div>
-        </ScrollReveal>
+              </ScrollReveal>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

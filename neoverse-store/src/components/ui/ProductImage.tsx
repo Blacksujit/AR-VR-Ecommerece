@@ -30,45 +30,47 @@ export function ProductImage({
   const [error, setError] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
-  if (!src || error) {
+  const normalizedSrc = src?.trim() || ''
+  const isLocalSource = normalizedSrc.startsWith('/')
+  const isRemoteSource = /^https:\/\//i.test(normalizedSrc)
+  const isUsableSource = Boolean(normalizedSrc) && (isLocalSource || isRemoteSource)
+
+  if (!isUsableSource || error) {
     return (
       <div
         className={cn(
-          'flex items-center justify-center bg-white/5 text-white/30',
+          'flex min-h-24 items-center justify-center bg-panel-soft px-4 text-center text-muted',
           fill ? 'absolute inset-0' : '',
           className
         )}
         style={aspectRatio ? { aspectRatio } : undefined}
         aria-label={alt}
       >
-        <span className="text-2xl font-bold select-none">
-          {alt?.charAt(0)?.toUpperCase() || '?'}
+        <span className="text-xs font-medium uppercase tracking-[0.12em] select-none">
+          Product image unavailable
         </span>
       </div>
     )
   }
 
   const imgProps = {
-    src,
+    src: normalizedSrc,
     alt,
     className: cn(
-      'object-cover transition-opacity duration-300',
-      loaded ? 'opacity-100' : 'opacity-0',
+      'object-cover transition-opacity duration-200',
+      loaded ? 'opacity-100' : 'opacity-90',
       className
     ),
-    onLoadingComplete: () => setLoaded(true),
+    onLoad: () => setLoaded(true),
     onError: () => setError(true),
     priority,
     sizes: sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
-    unoptimized: process.env.NODE_ENV === 'development',
+    unoptimized: process.env.NODE_ENV === 'development' || isLocalSource,
   }
 
   if (fill) {
     return (
       <>
-        {!loaded && (
-          <div className="absolute inset-0 animate-pulse bg-white/5" />
-        )}
         <Image {...imgProps} fill />
       </>
     )
@@ -76,12 +78,6 @@ export function ProductImage({
 
   return (
     <>
-      {!loaded && (
-        <div
-          className="animate-pulse bg-white/5"
-          style={{ width, height, aspectRatio }}
-        />
-      )}
       <Image {...imgProps} width={width} height={height} />
     </>
   )

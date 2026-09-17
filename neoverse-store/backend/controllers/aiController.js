@@ -1,13 +1,19 @@
 const Product = require('../models/Product');
 const { AppError } = require('../middleware/errorHandler');
+const { GoogleGenAI } = require('@google/genai');
 const { answerShoppingQuestion, getClient: getClaudeClient } = require('../services/claudeShoppingService');
 
+const getGeminiClient = () => {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  return apiKey ? new GoogleGenAI({ apiKey }) : null;
+};
+
 const getAvailableModel = () => {
+  // Gemini is the configured primary provider for the shopping assistant.
+  // Other providers remain available as explicit fallbacks when configured.
+  if (getGeminiClient()) return 'gemini';
   if (getClaudeClient()) return 'claude';
-  const openaiKey = process.env.OPENAI_API_KEY;
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (openaiKey) return 'openai';
-  if (geminiKey) return 'gemini';
+  if (process.env.OPENAI_API_KEY) return 'openai';
   return null;
 };
 
@@ -35,43 +41,56 @@ const queryOpenAI = async (messages) => {
   return data.choices[0].message.content;
 };
 
-const queryGemini = async (messages) => {
-  const history = messages.slice(0, -1).map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-  const lastMessage = messages[messages.length - 1].content;
+const queryGemini = async (messages, systemPrompt) => {
+  const ai = getGeminiClient();
+  if (!ai) throw new Error('Gemini is not configured');
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          ...history,
-          { role: 'user', parts: [{ text: lastMessage }] },
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1000,
-        },
-      }),
-    }
-  );
+  const history = messages
+    .filter((message) => message.role === 'user' || message.role === 'assistant')
+    .map((message) => ({
+      role: message.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: message.content }],
+    }));
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Gemini API error: ${error}`);
-  }
+  const response = await ai.models.generateContent({
+    model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+    contents: history,
+    config: {
+      systemInstruction: systemPrompt,
+      temperature: 0.35,
+      maxOutputTokens: 1000,
+    },
+  });
 
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+  const text = response.text?.trim();
+  if (!text) throw new Error('Gemini returned an empty response');
+
+  return {
+    text,
+    model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+    usage: response.usageMetadata,
+  };
+};
+
+const parseBudget = (query) => {
+  const normalized = query.toLowerCase();
+  const numericMatch = query.match(/(?:under|below|less than|max(?:imum)?(?: budget)?(?: of)?)\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
+  if (numericMatch) return Number(numericMatch[1].replace(/,/g, ''));
+
+  const wordMatch = normalized.match(/(?:under|below|less than|max(?:imum)?(?: budget)?(?: of)?)\s+(one hundred|two hundred|three hundred|five hundred|one thousand)\s+dollars?/i);
+  const wordBudgets = {
+    'one hundred': 100,
+    'two hundred': 200,
+    'three hundred': 300,
+    'five hundred': 500,
+    'one thousand': 1000,
+  };
+  return wordMatch ? wordBudgets[wordMatch[1]] : null;
 };
 
 const extractIntent = (query) => {
   const normalized = query.toLowerCase();
-  const priceMatch = query.match(/(?:under|below|less than|max(?:imum)?(?: budget)?(?: of)?)\s*\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/i);
+  const maxPrice = parseBudget(query);
   const minRatingMatch = query.match(/(\d+(?:\.\d+)?)\s*star/i);
   const wantsInspection = /\b(3d|ar|augmented reality|vr|virtual reality|inspect|place in|room|space)\b/i.test(normalized);
   const wantsComparison = /\b(compare|comparison|versus|vs\.?|difference|which one|better)\b/i.test(normalized);
@@ -79,12 +98,12 @@ const extractIntent = (query) => {
   const intent = wantsComparison ? 'compare'
     : wantsInspection ? 'inspection'
       : wantsAvailability ? 'availability'
-        : priceMatch ? 'budget'
+        : maxPrice !== null ? 'budget'
           : 'discover';
 
   return {
     intent,
-    maxPrice: priceMatch ? Number(priceMatch[1].replace(/,/g, '')) : null,
+    maxPrice,
     minRating: minRatingMatch ? Number(minRatingMatch[1]) : null,
     wantsInspection,
     wantsComparison,
@@ -131,7 +150,7 @@ const buildProductContext = async (query) => {
   const products = await Product.find(dbQuery)
     .select('name slug price description rating category tags images discount stock brand modelUrl isARSupported isVRSupported specifications')
     .sort({ stock: -1, rating: -1 })
-    .limit(20)
+    .limit(12)
     .lean();
 
   return { products, intent };
@@ -146,12 +165,15 @@ const chat = async (req, res, next) => {
 
     const model = getAvailableModel();
     if (!model) {
-      return res.json({
-        success: true,
+      return res.status(503).json({
+        success: false,
         data: {
-          response: 'Shopping guidance is not configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to the backend environment.',
+          response: 'The shopping assistant is temporarily unavailable because no AI provider is configured. You can still browse and compare the catalog manually.',
+          intent: extractIntent(message),
+          evidence: [],
           products: [],
         },
+        message: 'AI provider is not configured',
       });
     }
 
@@ -195,6 +217,18 @@ RULES:
     let providerModel;
     if (model === 'claude') {
       const result = await answerShoppingQuestion({ message, history: chatHistory, products });
+      if (!result) {
+        return res.status(503).json({
+          success: false,
+          data: {
+            response: 'The shopping assistant is temporarily unavailable. You can still browse the matching catalog results below.',
+            intent,
+            evidence: products.map((p) => ({ productId: p._id, fields: { price: p.price, availability: p.stock > 0 ? 'Available' : 'Out of stock' } })),
+            products: [],
+          },
+          message: 'AI provider is unavailable',
+        });
+      }
       response = result.response;
       recommendationIds = result.recommendationIds;
       usage = result.usage;
@@ -206,11 +240,17 @@ RULES:
         { role: 'user', content: message },
       ]);
     } else {
-      response = await queryGemini([
-        { role: 'system', content: systemPrompt },
+      const result = await queryGemini([
         ...chatHistory,
         { role: 'user', content: message },
-      ]);
+      ], systemPrompt);
+      response = result.text;
+      providerModel = result.model;
+      usage = result.usage ? {
+        input_tokens: result.usage.promptTokenCount,
+        output_tokens: result.usage.candidatesTokenCount,
+        total_tokens: result.usage.totalTokenCount,
+      } : undefined;
     }
 
     const recommendationIdSet = new Set(recommendationIds.map((id) => id.toString()));
@@ -228,9 +268,9 @@ RULES:
             rating: p.rating,
             category: p.category,
             capabilities: {
-              model3d: Boolean(p.modelUrl),
-              ar: Boolean(p.isARSupported),
-              vr: Boolean(p.isVRSupported),
+              model3d: Boolean(p.modelUrl && /^https:\/\//i.test(p.modelUrl) && /\.(glb|gltf)(?:[?#].*)?$/i.test(p.modelUrl)),
+              ar: Boolean(p.modelUrl && p.isARSupported),
+              vr: Boolean(p.modelUrl && p.isVRSupported),
             },
           },
         })),
@@ -249,9 +289,9 @@ RULES:
           category: p.category,
           brand: p.brand,
           capabilities: {
-            model3d: Boolean(p.modelUrl),
-            ar: Boolean(p.isARSupported),
-            vr: Boolean(p.isVRSupported),
+            model3d: Boolean(p.modelUrl && /^https:\/\//i.test(p.modelUrl) && /\.(glb|gltf)(?:[?#].*)?$/i.test(p.modelUrl)),
+            ar: Boolean(p.modelUrl && p.isARSupported),
+            vr: Boolean(p.modelUrl && p.isVRSupported),
           },
           specifications: (p.specifications || []).slice(0, 6),
           recommended: recommendationIdSet.has(p._id.toString()),
@@ -267,7 +307,25 @@ RULES:
     });
   } catch (error) {
     console.error('AI chat error:', error);
-    next(error);
+    const message = String(error?.message || '');
+    const isQuotaError = /429|quota|resource_exhausted|rate limit|too many requests/i.test(message);
+    const isProviderError = /api key|unauthorized|permission|not found|invalid|failed|unavailable|model/i.test(message);
+    const providerReason = isQuotaError
+      ? 'quota_or_rate_limit'
+      : /api key|unauthorized/i.test(message)
+        ? 'invalid_credentials'
+        : /not found|model/i.test(message)
+          ? 'model_unavailable'
+          : 'provider_request_failed';
+    return res.status(isQuotaError ? 429 : isProviderError ? 502 : 500).json({
+      success: false,
+      message: isQuotaError
+        ? 'The AI provider rate limit has been reached. Please try again later.'
+        : 'The AI provider could not complete this request.',
+      code: isQuotaError ? 'AI_RATE_LIMITED' : 'AI_PROVIDER_ERROR',
+      reason: providerReason,
+      retryAfterSeconds: isQuotaError ? 60 : undefined,
+    });
   }
 };
 

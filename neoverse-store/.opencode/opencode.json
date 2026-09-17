@@ -67,6 +67,11 @@
         "GUMROAD_ACCESS_TOKEN": "${GUMROAD_ACCESS_TOKEN}"
       },
       "enabled": true
+    },
+    "stitch": {
+      "type": "local",
+      "command": ["npx", "@_davideast/stitch-mcp", "proxy"],
+      "enabled": true
     }
   }
 }
