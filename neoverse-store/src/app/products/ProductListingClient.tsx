@@ -79,20 +79,22 @@ export default function ProductListingClient({ initialFilters, initialData, init
 
   const sortMap = useMemo<Record<string, string>>(() => ({
     'price-asc': 'price_asc', 'price-desc': 'price_desc',
-    'rating': 'rating', 'newest': 'newest', 'popular': 'createdAt',
+    'rating': 'rating', 'newest': 'newest', 'popular': 'popular',
   }), [])
 
   const queryParams = useMemo(() => ({
     page: currentPage,
     limit: ITEMS_PER_PAGE,
     ...(debouncedSearch ? { keyword: debouncedSearch } : {}),
-    ...(selectedCategory !== 'All' ? { category: selectedCategory } : {}),
+    ...(selectedCategory !== 'All'
+      ? { category: catRes?.data?.find(c => c.name === selectedCategory)?.slug ?? selectedCategory }
+      : {}),
     ...(selectedPriceRange ? { minPrice: selectedPriceRange.min } : {}),
     ...(selectedPriceRange && selectedPriceRange.max < Infinity ? { maxPrice: selectedPriceRange.max } : {}),
     ...(minRating > 0 ? { rating: minRating } : {}),
     ...(arOnly ? { arCompatible: true } : {}),
     ...(vrOnly ? { vrCompatible: true } : {}),
-    ...(sort !== 'popular' ? { sort: sortMap[sort] } : {}),
+    ...(sortMap[sort] ? { sort: sortMap[sort] } : {}),
   }), [currentPage, debouncedSearch, selectedCategory, selectedPriceRange, minRating, arOnly, vrOnly, sort, sortMap])
 
   const { data: apiData, isLoading } = useProducts(queryParams, initialData, initialPagination)

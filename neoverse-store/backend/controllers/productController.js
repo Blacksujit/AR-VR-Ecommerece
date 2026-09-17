@@ -72,6 +72,9 @@ const getProducts = async (req, res, next) => {
         case 'name':
           sortOption = { name: 1 };
           break;
+        case 'popular':
+          sortOption = { numReviews: -1, rating: -1 };
+          break;
         case 'discount':
           sortOption = { discount: -1 };
           break;
@@ -80,12 +83,23 @@ const getProducts = async (req, res, next) => {
       }
     }
 
-    const pageNum = Math.max(1, Number(page));
-    const limitNum = Math.min(50, Math.max(1, Number(limit)));
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
+    const pageNum = Number.isFinite(parsedPage) ? Math.max(1, parsedPage) : 1;
+    const limitNum = Number.isFinite(parsedLimit) ? Math.min(50, Math.max(1, parsedLimit)) : 12;
     const skip = (pageNum - 1) * limitNum;
 
+    // Add a stable tie-breaker so items do not move between pages when
+    // multiple products share the same primary sort value.
+    const stableSort = { ...sortOption, _id: 1 };
+
     const [products, total] = await Promise.all([
-      Product.find(query).sort(sortOption).skip(skip).limit(limitNum),
+      Product.find(query)
+        .select('-__v')
+        .sort(stableSort)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
       Product.countDocuments(query),
     ]);
 

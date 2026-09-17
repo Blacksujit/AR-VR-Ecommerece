@@ -91,9 +91,11 @@ const productSchema = mongoose.Schema(
 );
 
 productSchema.index({ name: 'text', description: 'text', tags: 'text' });
-productSchema.index({ category: 1 });
+productSchema.index({ category: 1, createdAt: -1 });
 productSchema.index({ brand: 1 });
 productSchema.index({ price: 1 });
-productSchema.index({ rating: -1 });
+productSchema.index({ rating: -1, numReviews: -1 });
+productSchema.index({ isARSupported: 1, category: 1, createdAt: -1 });
+productSchema.index({ isVRSupported: 1, category: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Product', productSchema);
