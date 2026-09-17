@@ -4,13 +4,13 @@ import { useState, useRef, Suspense, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, ContactShadows, Environment, Html, useProgress, useGLTF } from '@react-three/drei'
 import { Group } from 'three'
-import { Loader2, Minimize2, RotateCcw, Expand, Image as ImageIcon, Ruler } from 'lucide-react'
+import { Loader2, Minimize2, RotateCcw, Expand, Image as ImageIcon, Ruler, AlertTriangle } from 'lucide-react'
 
 function isGlbModel(url?: string | null): url is string {
   return !!url && /^https:\/\//i.test(url) && /\.(glb|gltf)(?:[?#].*)?$/i.test(url)
 }
 
-function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRotate?: boolean }) {
+function ModelViewer({ modelUrl, autoRotate = true, onError }: { modelUrl: string; autoRotate?: boolean; onError: () => void }) {
   const meshRef = useRef<Group>(null)
 
   useFrame((_, delta) => {
@@ -23,7 +23,7 @@ function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRo
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} />
       <group ref={meshRef}>
-        <GLTFModel url={modelUrl} />
+        <GLTFModel url={modelUrl} onError={onError} />
       </group>
       <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={5} blur={2} />
       <Environment preset="city" />
@@ -40,9 +40,14 @@ function ModelViewer({ modelUrl, autoRotate = true }: { modelUrl: string; autoRo
   )
 }
 
-function GLTFModel({ url }: { url: string }) {
-  const { scene } = useGLTF(url)
-  return <primitive object={scene} scale={1} />
+function GLTFModel({ url, onError }: { url: string; onError: () => void }) {
+  try {
+    const { scene } = useGLTF(url)
+    return <primitive object={scene} scale={1} />
+  } catch {
+    onError()
+    return null
+  }
 }
 
 function Loader() {
@@ -59,16 +64,22 @@ function Loader() {
 
 interface ProductViewerProps {
   modelUrl?: string | null
+  modelUsdzUrl?: string | null
+  isARSupported?: boolean
+  isVRSupported?: boolean
   productName: string
   imageUrl?: string
   specifications?: { key: string; value: string }[]
 }
 
-export default function ProductViewer({ modelUrl, productName, imageUrl, specifications = [] }: ProductViewerProps) {
+export default function ProductViewer({ modelUrl, modelUsdzUrl, isARSupported = false, isVRSupported = false, productName, imageUrl, specifications = [] }: ProductViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [modelError, setModelError] = useState(false)
   const [autoRotate, setAutoRotate] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const hasModel = isGlbModel(modelUrl)
+  const hasArAsset = Boolean(isARSupported && hasModel && modelUsdzUrl && /^https:\/\//i.test(modelUsdzUrl) && /\.usdz(?:[?#].*)?$/i.test(modelUsdzUrl))
+  const inspectionModes = [hasModel && '3D', hasArAsset && 'AR', hasModel && isVRSupported && 'VR'].filter(Boolean)
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return
@@ -87,7 +98,7 @@ export default function ProductViewer({ modelUrl, productName, imageUrl, specifi
     return () => document.removeEventListener('fullscreenchange', handler)
   }, [])
 
-  if (!hasModel) {
+  if (!hasModel || modelError) {
     return (
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
         <div className="relative aspect-[4/3] overflow-hidden bg-black/20">
@@ -100,15 +111,18 @@ export default function ProductViewer({ modelUrl, productName, imageUrl, specifi
             </div>
           )}
           <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs text-white/70 backdrop-blur">
-            Image inspection
+            {modelError ? '3D asset unavailable' : 'Image inspection'}
           </div>
         </div>
         <div className="space-y-4 p-5">
           <div>
-            <h4 className="text-sm font-medium text-white">Verified 3D inspection is not available</h4>
+            <div className="flex items-center gap-2">
+              {modelError && <AlertTriangle className="h-4 w-4 text-amber-300" />}
+              <h4 className="text-sm font-medium text-white">Verified 3D inspection is not available</h4>
+            </div>
             <p className="mt-1 text-xs leading-5 text-white/50">
-              We only enable 3D and AR when this product has a verified model asset. Nothing here is a generic substitute for the real product.
-            </p>
+                {modelError ? 'The verified model could not be loaded. The product image and specifications remain available.' : 'We only enable 3D and AR when this product has a verified model asset. Nothing here is a generic substitute for the real product.'}
+              </p>
           </div>
           {specifications.length > 0 && (
             <div className="rounded-xl border border-white/10 bg-black/10 p-3">
@@ -137,8 +151,11 @@ export default function ProductViewer({ modelUrl, productName, imageUrl, specifi
       style={{ height: isFullscreen ? '100vh' : '500px' }}
     >
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }} gl={{ antialias: true, alpha: true }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
-        <ModelViewer modelUrl={modelUrl} autoRotate={autoRotate} />
+        <ModelViewer modelUrl={modelUrl} autoRotate={autoRotate} onError={() => setModelError(true)} />
       </Canvas>
+      <div className="absolute left-4 top-4 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/80 backdrop-blur-sm">
+        Verified inspection: {inspectionModes.join(' · ')}
+      </div>
       <div className="absolute bottom-4 left-4 flex gap-2">
         <button onClick={() => setAutoRotate(!autoRotate)} className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white backdrop-blur-sm transition-colors hover:bg-white/20">
           <RotateCcw className={`h-3 w-3 ${autoRotate ? 'text-[#5B7FFF]' : ''}`} />

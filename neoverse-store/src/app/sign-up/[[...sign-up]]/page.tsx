@@ -49,16 +49,16 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="glass rounded-2xl p-8 max-w-md w-full">
+    <div className="min-h-[calc(100dvh-4rem)] overflow-y-auto bg-background px-4 py-10 sm:px-6 lg:flex lg:items-center lg:justify-center">
+      <div className="mx-auto w-full max-w-md rounded-2xl border border-line bg-panel p-6 shadow-xl sm:p-8">
         <Link href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back to store
         </Link>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold">Create Account</h1>
-          <p className="text-white/60 mt-2">Join the NeoVerse community</p>
+          <h1 className="text-3xl font-display font-bold text-paper">Create your account</h1>
+          <p className="mt-2 text-muted">Save products and keep your inspection history in one place.</p>
         </div>
 
         {error && (

@@ -252,6 +252,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 <h3 className="text-lg font-semibold text-white mb-4">3D View</h3>
                 <ProductViewer
                   modelUrl={product.modelUrl}
+                  modelUsdzUrl={product.modelUsdzUrl}
+                  isARSupported={product.isARSupported}
+                  isVRSupported={product.isVRSupported}
                   productName={product.name}
                   imageUrl={product.images?.[0]}
                   specifications={product.specifications}
@@ -267,7 +270,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 </div>
                 <div className="mt-4 flex items-center gap-2 text-sm text-white/40">
                   <Clock className="w-4 h-4" />
-                  Est. delivery: 3-5 business days
+                  Inspection status follows verified catalog assets.
                 </div>
               </Card>
             </ScrollReveal>
