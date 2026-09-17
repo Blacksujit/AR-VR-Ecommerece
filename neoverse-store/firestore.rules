@@ -36,10 +36,14 @@ service cloud.firestore {
     }
 
     // ===============================================================
-    // Products Collection (public read-only)
+    // Products Collection (public catalog)
     // ===============================================================
+    // Product documents are intentionally world-readable: the storefront
+    // exposes catalog browsing before sign-in. Product records contain only
+    // public merchandising data; customer, order, and payment data is kept in
+    // owner-scoped collections below and is never covered by this exception.
     match /products/{productId} {
-      allow read: if true;
+      allow read: if resource.data.isPublic == true;
       allow write: if isAuthenticated() && request.auth.token.admin == true;
     }
 

@@ -127,7 +127,10 @@ const getRecommendations = async (req, res, next) => {
     }
 
     sortFields.push({ createdAt: -1 });
-    const sortObj = sortFields.reduce((acc, s) => ({ ...acc, ...s }), {});
+    const sortObj = sortFields.reduce((acc, s) => {
+          Object.assign(acc, s);
+          return acc;
+        }, {});
 
     const recommendations = await query
       .sort(sortObj)

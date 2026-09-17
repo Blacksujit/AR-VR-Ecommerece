@@ -83,7 +83,7 @@ export default function ARViewer({ modelUrl, productName, poster }: ARViewerProp
     <>
       <button
         onClick={openAR}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#5B7FFF] to-[#8B5CF6] px-4 py-3 font-medium text-white transition-all hover:opacity-90 active:scale-[0.98]"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#5B7FFF] to-[#8B5CF6] px-4 py-3 font-medium text-white transition-opacity hover:opacity-90 transition-transform active:scale-[0.98]"
       >
         <Smartphone className="h-4 w-4" />
         View in Your Space

@@ -194,7 +194,7 @@ export default function CheckoutPage() {
           {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all',
+                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors',
                 i <= step ? 'bg-primary text-white' : 'bg-white/10 text-white/40'
               )}>
                 {i < step ? '✓' : i + 1}

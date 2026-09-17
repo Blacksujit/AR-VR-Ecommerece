@@ -160,7 +160,7 @@ export default function StoreMap({
         {loadState === 'ready' && (
           <button
             onClick={handleGetDirections}
-            className="absolute bottom-4 left-4 z-20 flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-all shadow-lg hover:shadow-glow"
+            className="absolute bottom-4 left-4 z-20 flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-[colors,box-shadow] shadow-lg hover:shadow-glow"
             aria-label="Get directions to store"
           >
             <Navigation className="w-4 h-4" />

@@ -159,7 +159,7 @@ export default function ImageUploader({
         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handlePickerClick() }}
         aria-label="Upload images - drag and drop or click to select"
         className={cn(
-          'relative flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer',
+          'relative flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed transition-colors duration-300 cursor-pointer',
           isDragging
             ? 'border-primary bg-primary/10'
             : 'border-white/10 bg-white/5 hover:border-primary/30 hover:bg-primary/5'
@@ -254,7 +254,7 @@ export default function ImageUploader({
           {remaining > 0 && !isUploading && (
             <button
               onClick={handlePickerClick}
-              className="aspect-square rounded-xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-1.5 text-white/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all"
+              className="aspect-square rounded-xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-1.5 text-white/40 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-colors"
               aria-label="Add more images"
             >
               <ImagePlus className="w-6 h-6" />

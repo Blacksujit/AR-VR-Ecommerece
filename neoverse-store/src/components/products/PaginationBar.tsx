@@ -17,7 +17,7 @@ export function PaginationBar({ currentPage, totalPages, onPageChange }: Paginat
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="p-2 rounded-xl glass border border-glass-border text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className="p-2 rounded-xl glass border border-glass-border text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         aria-label="Previous page"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -27,7 +27,7 @@ export function PaginationBar({ currentPage, totalPages, onPageChange }: Paginat
           key={page}
           onClick={() => onPageChange(page)}
           className={cn(
-            'w-10 h-10 rounded-xl text-sm font-medium transition-all',
+            'w-10 h-10 rounded-xl text-sm font-medium transition-colors',
             page === currentPage
               ? 'bg-primary text-white shadow-glow'
               : 'glass border border-glass-border text-white/60 hover:text-white'
@@ -41,7 +41,7 @@ export function PaginationBar({ currentPage, totalPages, onPageChange }: Paginat
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-xl glass border border-glass-border text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className="p-2 rounded-xl glass border border-glass-border text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         aria-label="Next page"
       >
         <ChevronRight className="w-4 h-4" />

@@ -67,7 +67,7 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-3 gap-8 mb-16">
           {contactInfo.map(({ icon: Icon, label, value, desc }, i) => (
             <ScrollReveal key={label} delay={i * 0.1}>
-              <Card className="p-6 text-center hover:border-primary/30 transition-all duration-500 group">
+              <Card className="p-6 text-center hover:border-primary/30 transition-colors duration-500 group">
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-control border border-line bg-panel-soft">
                   <Icon className="h-6 w-6 text-electric" />
                 </div>
@@ -128,7 +128,7 @@ export default function ContactPage() {
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-white/80">Message</label>
                     <textarea
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 transition-all duration-300 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 min-h-[140px] resize-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 transition-colors duration-300 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 min-h-[140px] resize-none"
                       placeholder="Tell us more about your inquiry..."
                       value={formData.message}
                       onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}

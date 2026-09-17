@@ -65,7 +65,7 @@ export default function Navbar() {
       role="navigation"
       aria-label="Main navigation"
       className={cn(
-        'fixed top-0 inset-x-0 z-50 transition-all duration-300',
+        'fixed top-0 inset-x-0 z-50 transition-colors duration-300',
         scrolled
           ? 'border-b border-line bg-ink/90 shadow-soft backdrop-blur-xl'
           : 'bg-ink/70 backdrop-blur-md'
@@ -140,7 +140,7 @@ export default function Navbar() {
                 >
                   {getInitials(user.name)}
                 </button>
-                <div className="invisible absolute right-0 top-full mt-2 w-48 translate-y-1 rounded-control border border-line bg-panel/95 opacity-0 shadow-elevated backdrop-blur-xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                <div className="invisible absolute right-0 top-full mt-2 w-48 translate-y-1 rounded-control border border-line bg-panel/95 opacity-0 shadow-elevated backdrop-blur-xl transition-[opacity,transform,visibility] duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                   <div className="py-2">
                     <Link
                       href="/dashboard"

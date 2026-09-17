@@ -85,7 +85,7 @@ export function TestimonialsSection() {
           <div className="relative min-h-[280px] flex items-center">
             <button
               onClick={goPrev}
-              className="absolute -left-4 lg:-left-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all duration-300"
+              className="absolute -left-4 lg:-left-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors duration-300"
               aria-label="Previous testimonial"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -142,7 +142,7 @@ export function TestimonialsSection() {
 
             <button
               onClick={goNext}
-              className="absolute -right-4 lg:-right-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all duration-300"
+              className="absolute -right-4 lg:-right-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors duration-300"
               aria-label="Next testimonial"
             >
               <ChevronRight className="w-5 h-5" />

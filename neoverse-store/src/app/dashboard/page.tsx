@@ -69,7 +69,7 @@ export default function DashboardHome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="p-4 hover:border-primary/30 transition-all">
+            <Card className="p-4 hover:border-primary/30 transition-colors">
               <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mb-3', bg)}>
                 <Icon className={cn('w-5 h-5', color)} />
               </div>

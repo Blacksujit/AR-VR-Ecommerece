@@ -91,7 +91,7 @@ function DesktopSidebarContent({ user, pathname, onLogout }: { user: any; pathna
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
                 isActive
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -106,7 +106,7 @@ function DesktopSidebarContent({ user, pathname, onLogout }: { user: any; pathna
 
       <button
         onClick={onLogout}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-error/70 hover:text-error hover:bg-error/5 transition-all mt-2"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-error/70 hover:text-error hover:bg-error/5 transition-colors mt-2"
       >
         <LogOut className="w-4 h-4 shrink-0" />
         Sign Out
@@ -147,7 +147,7 @@ function MobileSidebarContent({
               key={href}
               onClick={() => onNavigate(href)}
               className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left transition-all',
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-left transition-colors',
                 isActive
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
@@ -162,7 +162,7 @@ function MobileSidebarContent({
 
       <button
         onClick={onLogout}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-error/70 hover:text-error hover:bg-error/5 transition-all mt-2"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-error/70 hover:text-error hover:bg-error/5 transition-colors mt-2"
       >
         <LogOut className="w-4 h-4 shrink-0" />
         Sign Out

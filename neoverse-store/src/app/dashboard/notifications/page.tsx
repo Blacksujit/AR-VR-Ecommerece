@@ -93,7 +93,7 @@ export default function NotificationsPage() {
             key={key}
             onClick={() => setTypeFilter(key)}
             className={cn(
-              'px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-all border',
+              'px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors border',
               typeFilter === key
                 ? 'bg-primary/10 text-primary border-primary/30'
                 : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'

@@ -114,7 +114,7 @@ export default function AddressesPage() {
         <div className="grid sm:grid-cols-2 gap-4">
           {addresses.map((addr, i) => (
             <motion.div key={addr._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <Card className="p-5 relative group hover:border-primary/30 transition-all">
+              <Card className="p-5 relative group hover:border-primary/30 transition-colors">
                 {addr.isDefault && (
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
                     <Check className="w-3 h-3" /> Default

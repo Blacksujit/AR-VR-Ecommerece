@@ -37,7 +37,7 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {values.map(({ icon: Icon, title, desc }, i) => (
             <ScrollReveal key={title} delay={i * 0.1}>
-              <Card className="p-6 hover:border-primary/30 transition-all">
+              <Card className="p-6 hover:border-primary/30 transition-colors">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-control border border-line bg-panel-soft">
                   <Icon className="h-6 w-6 text-electric" />
                 </div>

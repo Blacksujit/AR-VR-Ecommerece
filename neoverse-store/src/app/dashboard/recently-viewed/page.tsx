@@ -72,7 +72,7 @@ export default function RecentlyViewedPage() {
             return (
               <motion.div key={rv._id} variants={itemAnim}>
                 <Link href={`/products/${p.slug || p._id}`}>
-                  <Card className="group overflow-hidden hover:border-primary/30 transition-all">
+                  <Card className="group overflow-hidden hover:border-primary/30 transition-colors">
                     <div className="aspect-square bg-gradient-to-br from-primary/5 to-accent/5 relative">
                       {p.images?.[0] ? (
                         <img

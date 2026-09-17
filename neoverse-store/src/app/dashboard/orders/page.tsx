@@ -88,7 +88,7 @@ export default function OrdersPage() {
             key={key}
             onClick={() => setStatusFilter(key)}
             className={cn(
-              'px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-all border',
+              'px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-colors border',
               statusFilter === key
                 ? 'bg-primary/10 text-primary border-primary/30'
                 : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'
@@ -122,7 +122,7 @@ export default function OrdersPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                <Card className="p-5 hover:border-primary/20 transition-all">
+                <Card className="p-5 hover:border-primary/20 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
                       <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shrink-0', statusStyles[order.status] || 'bg-white/10')}>

@@ -115,7 +115,7 @@ export function ProductInfo({
 
           <button
             onClick={onToggleWishlist}
-            className={cn('flex min-h-12 min-w-12 items-center justify-center rounded-control border transition-all', inWishlist
+            className={cn('flex min-h-12 min-w-12 items-center justify-center rounded-control border transition-colors', inWishlist
               ? 'border-error/30 bg-error/10 text-error'
               : 'border-line bg-panel-soft text-muted hover:border-error/30 hover:text-error'
             )}
@@ -124,7 +124,7 @@ export function ProductInfo({
             <Heart className="w-5 h-5" fill={inWishlist ? 'currentColor' : 'none'} />
           </button>
 
-          <button onClick={onShare} className="flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line bg-panel-soft text-muted transition-all hover:bg-panel hover:text-paper" aria-label="Share product">
+          <button onClick={onShare} className="flex min-h-12 min-w-12 items-center justify-center rounded-control border border-line bg-panel-soft text-muted transition-colors hover:bg-panel hover:text-paper" aria-label="Share product">
             <Share2 className="w-5 h-5" />
           </button>
         </div>

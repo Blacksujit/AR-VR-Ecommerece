@@ -198,7 +198,7 @@ export function VRShowroomScene() {
       <div className="absolute bottom-4 right-4 flex gap-2">
         <button
           onClick={() => setMusicOn(!musicOn)}
-          className={cn('p-3 glass rounded-xl transition-all', musicOn && 'bg-primary/20')}
+          className={cn('p-3 glass rounded-xl transition-colors', musicOn && 'bg-primary/20')}
         >
           <Music className={cn('w-5 h-5', musicOn && 'text-primary')} />
         </button>

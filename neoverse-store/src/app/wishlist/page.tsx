@@ -81,7 +81,7 @@ export default function WishlistPage() {
               const discountedPrice = calculateDiscountedPrice(product.price, product.discount)
               return (
                 <ScrollReveal key={product._id} delay={i * 0.05}>
-                  <Card className="group relative overflow-hidden hover:border-primary/30 transition-all duration-500">
+                  <Card className="group relative overflow-hidden hover:border-primary/30 transition-colors duration-500">
                     <Link href={`/products/${product.slug}`}>
                       <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-purple/10 flex items-center justify-center">
                         {product.images[0] ? (
@@ -94,7 +94,7 @@ export default function WishlistPage() {
 
                     <button
                       onClick={() => removeMutation.mutate(product._id)}
-                      className="absolute top-3 right-3 p-2 rounded-xl bg-black/40 backdrop-blur-sm text-error hover:bg-error/20 transition-all"
+                      className="absolute top-3 right-3 p-2 rounded-xl bg-black/40 backdrop-blur-sm text-error hover:bg-error/20 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
