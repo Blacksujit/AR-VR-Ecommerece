@@ -2,11 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "services": {
     "neoverse_store_web": {
-      "root": ".",
+      "root": "neoverse-store/",
       "framework": "nextjs",
-      "buildCommand": "npm --prefix neoverse-store run build",
+      "buildCommand": "npm run build",
       "installCommand": "npm install --legacy-peer-deps",
-      "outputDirectory": "neoverse-store/.next"
+      "outputDirectory": ".next"
     }
   },
   "rewrites": [
