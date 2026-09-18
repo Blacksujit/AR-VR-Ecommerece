@@ -67,8 +67,8 @@ Thumbs.db
 .vercel
 
 # BRAG launch-video skill and generated artifacts
-/.agents/skills/brag/
-/.claude/skills/brag/
-/.opencode/skills/brag/
-/agent/skills/brag/
-/brag-output*/
+**/.agents/skills/brag/
+**/.claude/skills/brag/
+**/.opencode/skills/brag/
+**/agent/skills/brag/
+**/brag-output*/
