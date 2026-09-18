@@ -20,8 +20,8 @@
       "enabled": true
     },
     "vercel": {
-      "type": "remote",
-      "url": "https://mcp.vercel.com",
+      "type": "local",
+      "command": ["npx", "-y", "mcp-remote", "https://mcp.vercel.com"],
       "enabled": true
     },
     "github": {
