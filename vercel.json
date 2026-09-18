@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "neoverse_store_web": {
+      "root": "neoverse-store/",
+      "framework": "nextjs",
+      "buildCommand": "npm run build",
+      "installCommand": "npm install --legacy-peer-deps",
+      "outputDirectory": ".next"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "neoverse_store_web"
+      }
+    }
+  ]
+}
