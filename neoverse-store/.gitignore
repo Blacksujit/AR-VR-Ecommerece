@@ -23,6 +23,7 @@ react-doctor-*.json
 
 # production
 /build
+/brag-output*/
 
 # misc
 .DS_Store
@@ -64,3 +65,4 @@ skills-lock.json
 Thumbs.db
 
 .vercel
+
