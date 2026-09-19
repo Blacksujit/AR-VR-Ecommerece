@@ -201,7 +201,3 @@ credentials/
 *.cookie
 *.jwt
 
-
-**/claude-skills/
-**/claude-skills/**
- 
