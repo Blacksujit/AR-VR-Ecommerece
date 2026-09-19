@@ -111,7 +111,7 @@ Rules:
 ### Typography
 
 - **Space Grotesk:** wordmark, page titles, hero claims, and major object names.
-- **Inter:** navigation, body copy, forms, buttons, metadata, prices, and operational screens. This is an intentional neutral interface choice for a trust-first commerce product, not decorative typography.
+, metadata, prices, and operational screens. This is an intentional neutral interface choice for a trust-first commerce product, not decorative typography.
 - Use sentence case.
 - Do not use decorative monospace labels.
 - Keep body line length between 45 and 78 characters.

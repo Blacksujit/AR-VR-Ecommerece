@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: Inter; src: local("Arial"); }
+    @font-face { font-family: SpaceGrotesk; src: local("Arial"); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #080b12; }
+    body { color: #f1efe8; font-family: Inter, Arial, sans-serif; }
+    #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #080b12; }
+    .clip { position: absolute; inset: 0; overflow: hidden; }
+    .scene { position: absolute; inset: 0; padding: 74px 92px; }
+    .scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, rgba(8,11,18,.18), transparent 42%, rgba(137,166,255,.06)); }
+    .eyebrow { position: absolute; top: 76px; left: 92px; color: #a3acb8; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; }
+    .count { position: absolute; top: 76px; right: 92px; color: #6f7a88; font-size: 20px; letter-spacing: .12em; }
+    h1, h2, p { margin: 0; }
+    h1, h2 { font-family: SpaceGrotesk, Arial, sans-serif; font-weight: 500; letter-spacing: -.055em; }
+    h1 { font-size: 106px; line-height: .94; }
+    h2 { font-size: 74px; line-height: .98; }
+    .sub { color: #a3acb8; font-size: 27px; line-height: 1.35; max-width: 650px; }
+    .rule { position: absolute; height: 1px; background: rgba(241,239,232,.2); }
+    .object { position: absolute; object-fit: cover; border-radius: 20px; filter: saturate(.9) contrast(1.04); box-shadow: 0 30px 80px rgba(0,0,0,.28); }
+    .panel { background: #121922; border: 1px solid rgba(241,239,232,.14); border-radius: 12px; }
+    .fact { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(241,239,232,.14); padding: 19px 0; font-size: 24px; }
+    .fact span:first-child { color: #a3acb8; }
+    .fact strong { color: #f1efe8; font-weight: 500; }
+    .blue { color: #89a6ff; }
+    .lime { color: #c7ed70; }
+    .dot { display: inline-block; width: 11px; height: 11px; margin-right: 10px; border-radius: 50%; background: #c7ed70; }
+    .button { display: inline-flex; padding: 18px 26px; border-radius: 10px; background: #89a6ff; color: #080b12; font-size: 22px; font-weight: 600; }
+    .grid { position: absolute; inset: 0; opacity: .12; background-image: linear-gradient(rgba(241,239,232,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(241,239,232,.16) 1px, transparent 1px); background-size: 96px 96px; }
+    .question { position: absolute; color: #f1efe8; font-size: 32px; border-left: 3px solid #89a6ff; padding-left: 22px; }
+    .mini-label { color: #6f7a88; font-size: 17px; letter-spacing: .1em; text-transform: uppercase; }
+    .brand { position: absolute; display: flex; align-items: center; gap: 18px; font-family: SpaceGrotesk, Arial, sans-serif; font-size: 38px; letter-spacing: -.04em; }
+    .mark { width: 54px; height: 54px; border-radius: 14px; background: #080b12; border: 2px solid #89a6ff; position: relative; }
+    .mark::before { content: ""; position: absolute; left: 13px; top: 11px; width: 24px; height: 24px; border: 3px solid #89a6ff; transform: rotate(30deg); }
+    .mark::after { content: ""; position: absolute; width: 8px; height: 8px; left: 21px; top: 20px; border-radius: 50%; background: #f1efe8; }
+    .scan { position: absolute; width: 12px; height: 12px; border-left: 2px solid #89a6ff; border-top: 2px solid #89a6ff; }
+  </style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="40" data-width="1920" data-height="1080">
+  <div id="base-grid" class="clip" data-start="0" data-duration="40" data-track-index="0"><div class="grid"></div></div>
+
+  <section id="s1" class="clip scene" data-start="0" data-duration="6" data-track-index="1">
+    <div class="eyebrow">NeoVerse / product intelligence</div><div class="count">01 / 06</div>
+    <div style="position:absolute;left:92px;top:284px;width:690px"><h1>A product photo<br/>is only the start.</h1><p class="sub" style="margin-top:34px">The real questions begin when you need to decide.</p></div>
+    <img data-layout-allow-occlusion="true" class="object hero-img" src="assets/auraview.jpg" style="left:1010px;top:164px;width:700px;height:720px" />
+    <div class="question q1" style="left:838px;top:286px">Will it fit?</div><div class="question q2" style="left:820px;top:716px">Is it right?</div>
+    <div class="rule" style="left:92px;right:92px;bottom:98px"></div><div class="mini-label" style="left:92px;bottom:54px;position:absolute">Flat images leave decisions unfinished</div>
+  </section>
+
+  <section id="s2" data-layout-allow-overlap="true" class="clip scene" data-start="6" data-duration="7" data-track-index="1">
+    <div class="eyebrow">NeoVerse / inspection-first commerce</div><div class="count">02 / 06</div>
+    <div style="position:absolute;left:92px;top:210px;width:600px"><h2>Bring the<br/><span class="blue">evidence</span> closer.</h2><p class="sub" style="margin-top:34px">A calmer way to understand the object before you buy it.</p></div>
+    <div data-layout-allow-overlap="true" class="panel evidence-card" style="left:830px;top:180px;width:760px;height:690px;padding:44px 52px"><div class="mini-label">Featured object</div><h2 style="font-size:50px;margin-top:18px">AuraView</h2><p style="color:#a3acb8;font-size:23px;margin-top:10px">Spatial display system / graphite</p><div style="margin-top:56px"><div class="fact"><span>Dimensions</span><strong>42 × 18 × 12 cm</strong></div><div class="fact"><span>Material</span><strong>Recycled aluminium</strong></div><div class="fact"><span>Availability</span><strong class="lime"><span class="dot"></span>In stock</strong></div><div class="fact"><span>Price</span><strong>$389.00</strong></div></div><div style="position:absolute;bottom:46px;left:52px;right:52px;display:flex;justify-content:space-between;align-items:center"><span class="blue" style="font-size:21px">3D available</span><span class="button">View details</span></div></div>
+  </section>
+
+  <section id="s3" class="clip scene" data-start="13" data-duration="7" data-track-index="1">
+    <div class="eyebrow">NeoVerse / compare with context</div><div class="count">03 / 06</div>
+    <div style="position:absolute;left:92px;top:180px"><h2>Compare what<br/>actually matters.</h2><p class="sub" style="margin-top:30px">Less browsing. More confidence.</p></div>
+    <div class="compare panel" style="left:92px;right:92px;top:500px;height:340px;padding:0 36px;display:grid;grid-template-columns:260px 1fr 1fr 1fr;align-items:center">
+      <div></div><div style="font-size:28px">AuraView</div><div style="font-size:28px">NovaLens</div><div style="font-size:28px">Holodeck Mini</div>
+      <div class="mini-label">Footprint</div><div>42 × 18 cm</div><div>18 × 10 cm</div><div>36 × 22 cm</div>
+      <div class="mini-label">3D view</div><div class="blue">Available</div><div class="blue">Available</div><div class="blue">Available</div>
+      <div class="mini-label">Price</div><div>$389</div><div>$249</div><div>$499</div>
+    </div>
+  </section>
+
+  <section id="s4" class="clip scene" data-start="20" data-duration="7" data-track-index="1">
+    <div class="eyebrow">NeoVerse / inspect in 3D</div><div class="count">04 / 06</div>
+    <div class="stage panel" style="left:92px;top:164px;width:1010px;height:760px;overflow:hidden;background:#0d121a"><div class="scan" style="left:48px;top:48px"></div><div class="scan" style="right:48px;top:48px;transform:rotate(90deg)"></div><img data-layout-allow-overflow="true" class="object spin-img" src="assets/quantumcore-xr.jpg" style="left:150px;top:100px;width:710px;height:560px;object-fit:contain;background:#19232e" /><div style="position:absolute;left:54px;bottom:48px;color:#a3acb8;font-size:20px">Drag to inspect / model loaded</div><div style="position:absolute;right:54px;bottom:48px;color:#89a6ff;font-size:20px">3D available</div></div>
+    <div style="position:absolute;left:1190px;top:238px;width:560px"><h2>See the object<br/>from every angle.</h2><p class="sub" style="margin-top:32px">Inspect materials, proportions, and details before the decision.</p><div class="rule" style="position:relative;width:100%;margin:52px 0 28px"></div><p style="font-size:25px;color:#a3acb8">The product stays the hero. The interface gives it context.</p></div>
+  </section>
+
+  <section id="s5" class="clip scene" data-start="27" data-duration="7" data-track-index="1">
+    <div class="eyebrow">NeoVerse / spatial inspection</div><div class="count">05 / 06</div>
+    <div style="position:absolute;left:92px;top:190px;width:640px"><h2>Understand the<br/><span class="blue">fit</span> in your space.</h2><p class="sub" style="margin-top:32px">When supported, place the product where it matters before you commit.</p><div class="button" style="margin-top:54px">Place in your room</div></div>
+    <div class="ar-frame panel" style="left:900px;top:140px;width:760px;height:780px;background:#19232e;overflow:hidden"><img class="object ar-img" src="assets/motion-chair.jpg" style="inset:0;width:100%;height:100%;border-radius:0;opacity:.75"/><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,11,18,.1),rgba(8,11,18,.7))"></div><div style="position:absolute;left:48px;top:48px;color:#f1efe8;font-size:22px">Camera preview</div><div style="position:absolute;left:48px;bottom:48px"><div class="mini-label">Supported on this device</div><div style="font-size:32px;margin-top:10px">Spatial view active</div></div><div style="position:absolute;right:48px;top:48px;width:52px;height:52px;border:2px solid #89a6ff;border-radius:50%"></div></div>
+  </section>
+
+  <section id="s6" data-layout-allow-overflow="true" class="clip scene" data-start="34" data-duration="6" data-track-index="1">
+    <div class="eyebrow">NeoVerse / decide with confidence</div><div class="count">06 / 06</div>
+    <div class="panel" style="position:absolute;left:92px;top:190px;width:740px;height:530px;padding:48px"><div class="mini-label">Your bag</div><h2 style="font-size:48px;margin-top:18px">AuraView</h2><div class="fact" style="margin-top:48px"><span>Item</span><strong>$389.00</strong></div><div class="fact"><span>Availability</span><strong class="lime">Ready to ship</strong></div><div class="fact"><span>Total</span><strong>$389.00</strong></div><div class="button" style="margin-top:38px;width:100%;justify-content:center">Continue to checkout</div></div>
+    <div style="position:absolute;left:1000px;top:282px;width:700px"><h1>Know more.<br/><span class="blue">Choose better.</span></h1><p class="sub" style="margin-top:38px">NeoVerse turns inspection into a confident way to shop.</p></div>
+    <div class="rule" style="left:92px;right:92px;bottom:112px"></div>
+  </section>
+
+  <section id="end" class="clip scene" data-start="39.0" data-duration="1" data-track-index="2"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column"><div class="brand"><div class="mark"></div><span>NeoVerse</span></div><div style="font-family:SpaceGrotesk,Arial;font-size:42px;letter-spacing:-.04em;margin-top:34px">Inspect the object. Understand the fit. Decide with confidence.</div><div style="color:#89a6ff;font-size:22px;margin-top:30px">neoverse.sujit.top</div></div></section>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  const fadeIn = (selector, start, duration = .8) => tl.fromTo(selector, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration, ease: 'power3.out' }, start);
+  const opacityIn = (selector, start, duration = .4) => tl.fromTo(selector, { opacity: 0 }, { opacity: 1, duration, ease: 'power2.out' }, start);
+  const opacityOut = (selector, start, duration = .5) => tl.to(selector, { opacity: 0, duration, ease: 'power2.in' }, start);
+  gsap.set('#s1', { opacity: 1 });
+  fadeIn('#s1 .hero-img', 0.25, 1.1); fadeIn('#s1 h1', .35, .8); fadeIn('#s1 .sub', .8, .7); fadeIn('#s1 .q1', 1.35, .5); fadeIn('#s1 .q2', 2.2, .5);
+  opacityOut('#s1', 5.35, .5);
+  opacityIn('#s2', 5.8, .4); fadeIn('#s2 h2', 6.1, .7); fadeIn('#s2 .sub', 6.7, .6); fadeIn('#s2 .evidence-card', 6.3, 1); tl.fromTo('#s2 .fact', { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: .45, stagger: .18, ease: 'power2.out' }, 7.3); opacityOut('#s2', 12.35, .5);
+  opacityIn('#s3', 12.8, .4); fadeIn('#s3 h2', 13.1, .7); fadeIn('#s3 .sub', 13.8, .5); fadeIn('#s3 .compare', 13.6, .8); tl.fromTo('#s3 .compare > *', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .35, stagger: .12 }, 14.3); opacityOut('#s3', 19.35, .5);
+  opacityIn('#s4', 19.8, .4); fadeIn('#s4 .stage', 20.1, .8); fadeIn('#s4 h2', 20.4, .7); fadeIn('#s4 .sub', 21.1, .6); tl.to('#s4 .spin-img', { rotation: 7, scale: 1.05, duration: 2.8, ease: 'sine.inOut' }, 20.8); opacityOut('#s4', 26.35, .5);
+  opacityIn('#s5', 26.8, .4); fadeIn('#s5 h2', 27.1, .7); fadeIn('#s5 .sub', 27.7, .6); fadeIn('#s5 .button', 28.4, .5); fadeIn('#s5 .ar-frame', 27.2, .9); tl.fromTo('#s5 .ar-frame', { scale: .96 }, { scale: 1, duration: 2, ease: 'power2.out' }, 27.2); opacityOut('#s5', 33.35, .5);
+  opacityIn('#s6', 33.8, .4); fadeIn('#s6 .panel', 34.1, .8); fadeIn('#s6 h1', 34.3, .8); fadeIn('#s6 .sub', 35.1, .6); opacityOut('#s6', 38.8, .5); opacityIn('#end', 39.0, .4); fadeIn('#end .brand', 39.1, .5); fadeIn('#end div:nth-child(2)', 39.2, .5); fadeIn('#end div:nth-child(3)', 39.3, .4);
+  window.__timelines = window.__timelines || {};
+  window.__timelines['main'] = tl;
+  window.__hf = { duration: 40, seek(time, options) { tl.pause(); tl.seek(time); } };
+  tl.seek(0);
+</script>
+</body>
+</html>

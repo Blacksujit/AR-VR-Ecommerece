@@ -148,7 +148,7 @@ dist/
 .pnp.*
 
 # Ignore other repositories
-claude-skills/
+/claude-skills/
 .commandcode/
 
 mongodb-string.txt
@@ -158,3 +158,50 @@ claude-skills/
 .claude\skills
 .vercel
 neoverse-store/agent/skills/brag/
+
+.agents\skills\brag
+
+.claude\skills\brag
+
+agent\skills\brag
+
+# Local AI agents, skills, prompts, and assistant configuration
+agent/
+agents/
+skills/
+.agents/
+.claude/
+.commandcode/
+.cursor/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+*.prompt
+*.prompts
+
+# Secrets and credentials
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.jks
+*.keystore
+*credentials*.json
+*credential*.json
+*secret*.json
+*secrets*.json
+*.token
+*.tokens
+*.auth
+*.session
+*.cookie
+*.jwt
+
+
+**/claude-skills/
+**/claude-skills/**
+ 
